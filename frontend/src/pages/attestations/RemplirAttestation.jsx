@@ -122,6 +122,7 @@ export default function RemplirAttestation() {
     repere: '',
     manoeuvresCondamnation: '',
     instructions: padRows([]),
+    serviceDemandeur: '',
     permisFeu: false,
     permisFouille: false,
     permisControleRadio: false,
@@ -141,6 +142,7 @@ export default function RemplirAttestation() {
             repere: a.repere || '',
             manoeuvresCondamnation: a.manoeuvresCondamnation || '',
             instructions: padRows(a.instructions),
+            serviceDemandeur: res.data.serviceDemandeur || '',
             permisFeu: a.permisFeu || false,
             permisFouille: a.permisFouille || false,
             permisControleRadio: a.permisControleRadio || false,
@@ -270,9 +272,19 @@ export default function RemplirAttestation() {
             {/* ── COLONNE GAUCHE (60%) ── */}
             <div style={{ width: '60%' }} className="border-r border-gray-800">
 
-              <div className={`${border} border-l-0 border-t-0 border-b p-2`}>
+              <div className={`${border} border-l-0 border-t-0 border-b p-2 flex items-center gap-2`}>
                 <span className={labelSm}>RÉGIME DEMANDÉ PAR : </span>
-                <span className="text-sm text-gray-700">{d.serviceDemandeur || '—'}</span>
+                <select
+                  value={form.serviceDemandeur}
+                  onChange={set('serviceDemandeur')}
+                  className="flex-1 bg-transparent outline-none text-sm text-gray-900 border-b border-gray-400 cursor-pointer"
+                >
+                  <option value="">— Sélectionner —</option>
+                  <option value="Service Mécanique">Service Mécanique</option>
+                  <option value="Service Électrique">Service Électrique</option>
+                  <option value="Service Instrumentation & Contrôle commande CC">Service Instrumentation &amp; Contrôle commande CC</option>
+                  <option value="Prestation">Prestation</option>
+                </select>
               </div>
 
               <div className={`${border} border-l-0 border-t-0 border-b p-2`}>
@@ -343,7 +355,17 @@ export default function RemplirAttestation() {
                 </div>
                 <div className="border-l border-gray-800 p-2 flex-1">
                   <div className={`${labelSm} mb-1`}>SERVICE OU ENTREPRISE</div>
-                  <div className="text-sm text-gray-700">{d.serviceDemandeur || '—'}</div>
+                  <select
+                    value={form.serviceDemandeur}
+                    onChange={set('serviceDemandeur')}
+                    className="w-full bg-transparent outline-none text-sm text-gray-900 cursor-pointer"
+                  >
+                    <option value="">— Sélectionner —</option>
+                    <option value="Service Mécanique">Service Mécanique</option>
+                    <option value="Service Électrique">Service Électrique</option>
+                    <option value="Service Instrumentation & Contrôle commande CC">Service Instrumentation &amp; Contrôle commande CC</option>
+                    <option value="Prestation">Prestation</option>
+                  </select>
                 </div>
               </div>
 

@@ -8,7 +8,6 @@ const ROLE_LABELS = {
   charge_travaux: 'Chargé de Travaux',
   charge_consignation: 'Chargé de Consignation',
   charge_exploitation: 'Chargé d\'Exploitation',
-  assistant_charge_exploitation: 'Assistant C. Exploitation',
   chef_centrale: 'Chef de Centrale',
   chef_maintenance: 'Chef Maintenance',
 };

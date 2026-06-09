@@ -13,7 +13,6 @@ async function main() {
     { nom: 'Ben Ali', prenom: 'Mohamed', email: 'ctravaux@steg.com.tn', password: hashedPassword, role: 'charge_travaux', matricule: 'CT001', centrale: 'Centrale Goulette 2' },
     { nom: 'Trabelsi', prenom: 'Ahmed', email: 'cconsignation@steg.com.tn', password: hashedPassword, role: 'charge_consignation', matricule: 'CC001', centrale: 'Centrale Goulette 2' },
     { nom: 'Mansouri', prenom: 'Sami', email: 'cexploitation@steg.com.tn', password: hashedPassword, role: 'charge_exploitation', matricule: 'CE001', centrale: 'Centrale Goulette 2' },
-    { nom: 'Gharbi', prenom: 'Leila', email: 'asst@steg.com.tn', password: hashedPassword, role: 'assistant_charge_exploitation', matricule: 'ACE001', centrale: 'Centrale Goulette 2' },
     { nom: 'Bouzid', prenom: 'Kamel', email: 'chef.centrale@steg.com.tn', password: hashedPassword, role: 'chef_centrale', matricule: 'CHC001', centrale: 'Centrale Goulette 2' },
     { nom: 'Hamdi', prenom: 'Riadh', email: 'chef.maintenance@steg.com.tn', password: hashedPassword, role: 'chef_maintenance', matricule: 'CHM001', centrale: 'Centrale Goulette 2' },
   ];

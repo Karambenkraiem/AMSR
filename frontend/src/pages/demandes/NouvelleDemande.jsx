@@ -20,7 +20,7 @@ export default function NouvelleDemande() {
     designationOperation: '',
     tr: '', tg: '', niveau: '',
     ouvragesConcernes: '',
-    dateJ: '', dateM: '', dateA: '', dateH: '',
+    dateJ: '', dateM: '', dateA: '', dateHH: '', dateMM: '',
     dureePrevu: '',
     instructionsParticulieres: '',
     typeBon: '',
@@ -45,8 +45,8 @@ export default function NouvelleDemande() {
     setError('');
     setLoading(true);
     try {
-      const datePrevu = (form.dateJ && form.dateM && form.dateA && form.dateH)
-        ? new Date(`${form.dateA}-${form.dateM.padStart(2,'0')}-${form.dateJ.padStart(2,'0')}T${form.dateH}`)
+      const datePrevu = (form.dateJ && form.dateM && form.dateA && form.dateHH)
+        ? new Date(`${form.dateA}-${form.dateM.padStart(2,'0')}-${form.dateJ.padStart(2,'0')}T${form.dateHH.padStart(2,'0')}:${(form.dateMM || '00').padStart(2,'0')}`)
         : null;
       const res = await api.post('/demandes', {
         designationOperation: form.designationOperation,
@@ -60,6 +60,7 @@ export default function NouvelleDemande() {
         regimeType: form.regimeType,
         serviceDemandeur: form.serviceDemandeur,
         assistantId: form.assistantId || null,
+        serviceDemandeur: form.serviceDemandeur,
         permisFeu: form.permisFeu,
         permisControle: form.permisControle,
         permisAcces: form.permisAcces,
@@ -215,7 +216,7 @@ export default function NouvelleDemande() {
                       <th className="border border-gray-700 px-3 py-1 font-bold text-center bg-gray-50 w-12">J</th>
                       <th className="border border-gray-700 px-3 py-1 font-bold text-center bg-gray-50 w-12">M</th>
                       <th className="border border-gray-700 px-3 py-1 font-bold text-center bg-gray-50 w-16">A</th>
-                      <th className="border border-gray-700 px-3 py-1 font-bold text-center bg-gray-50 w-16">H</th>
+                      <th className="border border-gray-700 px-1 py-1 font-bold text-center bg-gray-50" colSpan={2}>H (24h)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -243,9 +244,24 @@ export default function NouvelleDemande() {
                       </td>
                       <td className="border border-gray-700">
                         <input
-                          type="time"
-                          value={form.dateH} onChange={set('dateH')}
-                          className={`${inputStyle} text-center w-20`}
+                          value={form.dateHH} onChange={set('dateHH')}
+                          className={`${inputStyle} text-center w-8`}
+                          placeholder="HH" maxLength={2}
+                          onBlur={(e) => {
+                            const v = parseInt(e.target.value);
+                            if (!isNaN(v)) setForm((f) => ({ ...f, dateHH: String(Math.min(23, Math.max(0, v))).padStart(2, '0') }));
+                          }}
+                        />
+                      </td>
+                      <td className="border border-gray-700">
+                        <input
+                          value={form.dateMM} onChange={set('dateMM')}
+                          className={`${inputStyle} text-center w-8`}
+                          placeholder="MM" maxLength={2}
+                          onBlur={(e) => {
+                            const v = parseInt(e.target.value);
+                            if (!isNaN(v)) setForm((f) => ({ ...f, dateMM: String(Math.min(59, Math.max(0, v))).padStart(2, '0') }));
+                          }}
                         />
                       </td>
                     </tr>
@@ -364,11 +380,16 @@ export default function NouvelleDemande() {
 
               <div className="mt-4 pt-3 border-t border-gray-300">
                 <div className={`${labelStyle} mb-1`}>Service demandeur :</div>
-                <input
+                <select
                   value={form.serviceDemandeur} onChange={set('serviceDemandeur')}
-                  className={`${inputStyle} border-b border-gray-400 pb-1`}
-                  placeholder="Nom du service"
-                />
+                  className="w-full bg-transparent outline-none text-sm text-gray-900 border-b border-gray-400 pb-1 cursor-pointer"
+                >
+                  <option value="">— Sélectionner —</option>
+                  <option value="Service Mécanique">Service Mécanique</option>
+                  <option value="Service Électrique">Service Électrique</option>
+                  <option value="Service Instrumentation & Contrôle commande CC">Service Instrumentation &amp; Contrôle commande CC</option>
+                  <option value="Prestation">Prestation</option>
+                </select>
               </div>
             </div>
           </div>

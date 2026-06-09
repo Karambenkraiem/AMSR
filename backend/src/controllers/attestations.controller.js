@@ -194,6 +194,23 @@ const terminerOperation = async (req, res) => {
   const { id } = req.params;
   const { assistantTermineeNom } = req.body;
 
+  // Vérifier les droits : CT qui a accepté le régime, CT actuel (après changement), chef_centrale ou admin
+  const attCheck = await prisma.attestation.findUnique({
+    where: { id: parseInt(id) },
+    include: { demande: true },
+  });
+  if (!attCheck) return res.status(404).json({ error: 'Attestation introuvable' });
+
+  const isRegimeDelivreCT = attCheck.regimeDelivreId === req.user.id;
+  const isCurrentCT = attCheck.demande.chargeTravauxId === req.user.id;
+  const isChefCentrale = ['chef_centrale', 'admin'].includes(req.user.role);
+
+  if (!isRegimeDelivreCT && !isCurrentCT && !isChefCentrale) {
+    return res.status(403).json({
+      error: 'Seul le chargé de travaux qui a accepté le régime, le chargé de travaux actuel, ou le chef de centrale peut déclarer l\'opération terminée',
+    });
+  }
+
   const att = await prisma.attestation.update({
     where: { id: parseInt(id) },
     data: {
@@ -245,6 +262,7 @@ const leverRegime = async (req, res) => {
 const updateAttestation = async (req, res) => {
   const { id } = req.params;
   const { codeBdm, ouvrageDesignation, local, repere, manoeuvresCondamnation, instructions,
+    serviceDemandeur,
     permisFeu, permisFouille, permisControleRadio, permisAcces } = req.body;
 
   const att = await prisma.attestation.update({
@@ -259,6 +277,14 @@ const updateAttestation = async (req, res) => {
     },
     include: attestationInclude,
   });
+
+  // Mettre à jour le service demandeur sur la demande si fourni
+  if (serviceDemandeur !== undefined) {
+    await prisma.demande.update({
+      where: { id: att.demandeId },
+      data: { serviceDemandeur },
+    });
+  }
 
   res.json(att);
 };

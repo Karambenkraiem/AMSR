@@ -121,6 +121,13 @@ export default function DetailDemande() {
   const isAssistantCT = user.id === demande.assistantChargeTravauxId;
   const canTravaux = isMainCT || isAssistantCT;
 
+  // Seul le CT qui a fait le régime accepté, ou le CT actuel (après changement), ou chef centrale peut terminer
+  const canTerminer =
+    user.id === att?.regimeDelivreId ||
+    user.id === demande.chargeTravauxId ||
+    user.role === 'chef_centrale' ||
+    user.role === 'admin';
+
   const hasAssistantStep = !!att?.assistantDelivreId;
   const assistantConfirmed = att?.regimeDelivreDate != null && ['en_cours','arret_temporaire','operation_terminee','cloturee'].includes(s);
 
@@ -442,8 +449,8 @@ export default function DetailDemande() {
                 <button onClick={() => setModal('changement')} className="btn-outline w-full text-sm">👤 Changement de chargé</button>
               )}
 
-              {/* Chargé travaux: terminer */}
-              {canTravaux && s === 'en_cours' && (
+              {/* Chargé travaux: terminer — uniquement le CT qui a accepté ou le CT actuel (après changement) ou chef centrale */}
+              {canTerminer && s === 'en_cours' && (
                 <button
                   onClick={() => doAction(async () => {
                     const assistantTermineeNom = demande.assistantChargeTravaux

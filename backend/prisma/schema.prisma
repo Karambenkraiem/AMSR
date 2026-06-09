@@ -13,7 +13,6 @@ enum Role {
   charge_travaux
   charge_consignation
   charge_exploitation
-  assistant_charge_exploitation
   chef_centrale
   chef_maintenance
 }

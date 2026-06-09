@@ -4,14 +4,14 @@ import api from '../../services/api';
 const ROLE_LABELS = {
   admin: 'Administrateur', charge_travaux: 'Chargé de Travaux',
   charge_consignation: 'Chargé de Consignation', charge_exploitation: 'Chargé d\'Exploitation',
-  assistant_charge_exploitation: 'Assistant C. Exploitation', chef_centrale: 'Chef de Centrale',
+  chef_centrale: 'Chef de Centrale',
   chef_maintenance: 'Chef Maintenance',
 };
 
 const ROLE_COLORS = {
   admin: 'bg-red-100 text-red-800', charge_travaux: 'bg-blue-100 text-blue-800',
   charge_consignation: 'bg-yellow-100 text-yellow-800', charge_exploitation: 'bg-green-100 text-green-800',
-  assistant_charge_exploitation: 'bg-purple-100 text-purple-800', chef_centrale: 'bg-gray-100 text-gray-800',
+  chef_centrale: 'bg-gray-100 text-gray-800',
   chef_maintenance: 'bg-orange-100 text-orange-800',
 };
 

@@ -133,6 +133,7 @@ const initAttestation = async (req, res) => {
   if (demande.attestation) return res.status(400).json({ error: 'Attestation déjà créée' });
 
   const { codeBdm, ouvrageDesignation, local, repere, manoeuvresCondamnation, instructions,
+    serviceDemandeur,
     permisFeu, permisFouille, permisControleRadio, permisAcces } = req.body;
 
   const attestation = await prisma.attestation.create({
@@ -149,7 +150,13 @@ const initAttestation = async (req, res) => {
     },
   });
 
-  await prisma.demande.update({ where: { id: demande.id }, data: { status: 'en_cours_attestation' } });
+  await prisma.demande.update({
+    where: { id: demande.id },
+    data: {
+      status: 'en_cours_attestation',
+      ...(serviceDemandeur !== undefined ? { serviceDemandeur } : {}),
+    },
+  });
 
   // Notify charge_exploitation
   const exploitants = await prisma.user.findMany({ where: { role: 'charge_exploitation', active: true } });
