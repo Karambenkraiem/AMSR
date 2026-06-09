@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: amsr_postgres
+    environment:
+      POSTGRES_USER: amsr_user
+      POSTGRES_PASSWORD: amsr_password
+      POSTGRES_DB: amsr_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amsr_user -d amsr_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: amsr_backend
+    environment:
+      DATABASE_URL: "postgresql://amsr_user:amsr_password@postgres:5432/amsr_db"
+      JWT_SECRET: "amsr_steg_jwt_secret_key_2024_very_long_and_secure"
+      PORT: 5000
+      NODE_ENV: production
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: amsr_frontend
+    environment:
+      BACKEND_URL: "http://backend:5000"
+    ports:
+      - "5175:5175"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body { @apply bg-gray-50 text-gray-900 font-sans; }
+}
+
+@layer components {
+  .btn-primary { @apply bg-steg-primary text-white px-4 py-2 rounded-lg hover:bg-steg-dark transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-secondary { @apply bg-steg-secondary text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors font-medium; }
+  .btn-danger { @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium; }
+  .btn-success { @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium; }
+  .btn-outline { @apply border border-steg-primary text-steg-primary px-4 py-2 rounded-lg hover:bg-steg-primary hover:text-white transition-colors font-medium; }
+  .input-field { @apply w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-steg-primary focus:border-transparent text-sm; }
+  .label { @apply block text-sm font-medium text-gray-700 mb-1; }
+  .card { @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6; }
+  .badge-soumise { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800; }
+  .badge-en_cours_attestation { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800; }
+  .badge-accord_exploitation { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800; }
+  .badge-regime_execute { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800; }
+  .badge-en_cours { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800; }
+  .badge-arret_temporaire { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800; }
+  .badge-operation_terminee { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800; }
+  .badge-cloturee { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800; }
+  .badge-rejetee { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-200 text-red-900; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+}
