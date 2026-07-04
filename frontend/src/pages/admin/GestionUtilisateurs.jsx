@@ -136,7 +136,7 @@ export default function GestionUtilisateurs() {
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="label">Matricule</label><input className="input-field" value={form.matricule} onChange={set('matricule')} placeholder="Ex: CT001" /></div>
+                <div><label className="label">Matricule *</label><input required className="input-field" value={form.matricule} onChange={set('matricule')} placeholder="Ex: CT001" /></div>
                 <div><label className="label">Centrale</label><input className="input-field" value={form.centrale} onChange={set('centrale')} /></div>
               </div>
               <div className="flex gap-3 justify-end pt-2">

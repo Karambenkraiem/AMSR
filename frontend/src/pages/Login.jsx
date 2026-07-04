@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [matricule, setMatricule] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      await login(matricule, password);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || 'Identifiants incorrects');
@@ -49,13 +49,13 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="label">Adresse email</label>
+              <label className="label">Matricule</label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={matricule}
+                onChange={(e) => setMatricule(e.target.value)}
                 className="input-field"
-                placeholder="votre.email@steg.com.tn"
+                placeholder="ADM001"
                 required
                 autoFocus
               />
@@ -77,13 +77,10 @@ export default function Login() {
           </form>
 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 font-medium mb-2">Comptes de démonstration :</p>
+            <p className="text-xs text-gray-500 font-medium mb-2">Compte de démonstration :</p>
             <div className="space-y-1 text-xs text-gray-500">
-              <div>admin@steg.com.tn — Admin</div>
-              <div>ctravaux@steg.com.tn — Chargé Travaux</div>
-              <div>cconsignation@steg.com.tn — Chargé Consignation</div>
-              <div>cexploitation@steg.com.tn — Chargé Exploitation</div>
-              <div className="text-gray-400 mt-1">Mot de passe: Admin@2024</div>
+              <div>ADMIN001 — Admin</div>
+              <div className="text-gray-400 mt-1">Mot de passe: 123456</div>
             </div>
           </div>
         </div>
