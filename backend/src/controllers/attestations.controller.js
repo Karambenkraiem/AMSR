@@ -201,13 +201,12 @@ const terminerOperation = async (req, res) => {
   });
   if (!attCheck) return res.status(404).json({ error: 'Attestation introuvable' });
 
-  const isRegimeDelivreCT = attCheck.regimeDelivreId === req.user.id;
   const isCurrentCT = attCheck.demande.chargeTravauxId === req.user.id;
   const isChefCentrale = ['chef_centrale', 'admin'].includes(req.user.role);
 
-  if (!isRegimeDelivreCT && !isCurrentCT && !isChefCentrale) {
+  if (!isCurrentCT && !isChefCentrale) {
     return res.status(403).json({
-      error: 'Seul le chargé de travaux qui a accepté le régime, le chargé de travaux actuel, ou le chef de centrale peut déclarer l\'opération terminée',
+      error: 'Seul le chargé de travaux affecté à cette demande peut déclarer l\'opération terminée',
     });
   }
 

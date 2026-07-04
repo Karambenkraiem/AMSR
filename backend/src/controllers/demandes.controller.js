@@ -29,10 +29,9 @@ const include = {
 };
 
 const getAll = async (req, res) => {
-  const { status, role } = req.query;
+  const { status } = req.query;
   const where = {};
   if (status) where.status = status;
-  if (req.user.role === 'charge_travaux') where.chargeTravauxId = req.user.id;
 
   const demandes = await prisma.demande.findMany({
     where,
@@ -328,4 +327,23 @@ const updateAssistant = async (req, res) => {
   res.json(updated);
 };
 
-module.exports = { getAll, getOne, create, initAttestation, arretTemporaire, reprendreOperations, changementCharge, updateAssistant, adminUpdateStatus };
+const adminDelete = async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Réservé à l\'administrateur' });
+  const { id } = req.params;
+  const did = parseInt(id);
+
+  const demande = await prisma.demande.findUnique({ where: { id: did }, include: { attestation: true } });
+  if (!demande) return res.status(404).json({ error: 'Demande introuvable' });
+
+  if (demande.attestation) {
+    await prisma.interruption.deleteMany({ where: { attestationId: demande.attestation.id } });
+    await prisma.changementCharge.deleteMany({ where: { attestationId: demande.attestation.id } });
+    await prisma.attestation.delete({ where: { id: demande.attestation.id } });
+  }
+  await prisma.notification.deleteMany({ where: { demandeId: did } });
+  await prisma.demande.delete({ where: { id: did } });
+
+  res.json({ message: 'Demande supprimée définitivement' });
+};
+
+module.exports = { getAll, getOne, create, initAttestation, arretTemporaire, reprendreOperations, changementCharge, updateAssistant, adminUpdateStatus, adminDelete };

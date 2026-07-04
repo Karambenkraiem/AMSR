@@ -4,25 +4,34 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding database...');
+  // Si l'admin existe déjà → base déjà initialisée, on ne touche à rien
+  const existing = await prisma.user.findFirst({
+    where: { role: 'admin' },
+  });
 
-  const hashedPassword = await bcrypt.hash('123456', 10);
-
-  const users = [
-    { nom: 'Administrateur', prenom: 'Système', email: 'admin@steg.com.tn', password: hashedPassword, role: 'admin', matricule: 'ADMIN001', centrale: 'Centrale Goulette 2' },
-  ];
-
-  for (const user of users) {
-    // Chercher par email OU par matricule pour éviter les conflits
-    const existing = await prisma.user.findFirst({
-      where: { OR: [{ email: user.email }, { matricule: user.matricule }] },
-    });
-    if (existing) continue; // Déjà présent, on ne touche pas
-
-    await prisma.user.create({ data: user });
+  if (existing) {
+    console.log('Base déjà initialisée, seed ignoré.');
+    return;
   }
 
-  console.log('Seeding completed. Admin login: ADMIN001 / 123456');
+  // Première initialisation : base vide → créer le super admin
+  console.log('Première initialisation de la base de données...');
+  const hashedPassword = await bcrypt.hash('Admin@2024', 10);
+
+  await prisma.user.create({
+    data: {
+      nom: 'Administrateur',
+      prenom: 'Système',
+      email: 'admin@steg.com.tn',
+      password: hashedPassword,
+      role: 'admin',
+      matricule: 'ADM001',
+      centrale: 'Centrale Goulette 2',
+      active: true,
+    },
+  });
+
+  console.log('Super admin créé : matricule=ADM001 / mot de passe=Admin@2024');
 }
 
 main()

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { format } from 'date-fns';
@@ -17,8 +17,11 @@ const STATUT_LABELS = {
   rejetee: 'Rejetée',
 };
 
-const StatCard = ({ label, value, color, icon }) => (
-  <div className={`card flex items-center gap-4`}>
+const StatCard = ({ label, value, color, icon, onClick }) => (
+  <div
+    onClick={onClick}
+    className={`card flex items-center gap-4 cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 select-none`}
+  >
     <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl ${color}`}>{icon}</div>
     <div>
       <div className="text-2xl font-bold text-gray-900">{value}</div>
@@ -29,6 +32,7 @@ const StatCard = ({ label, value, color, icon }) => (
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -41,7 +45,6 @@ export default function Dashboard() {
     enCours: demandes.filter((d) => d.status === 'en_cours').length,
     attente: demandes.filter((d) => ['soumise', 'en_cours_attestation', 'accord_exploitation', 'regime_execute'].includes(d.status)).length,
     arret: demandes.filter((d) => d.status === 'arret_temporaire').length,
-    cloturees: demandes.filter((d) => d.status === 'cloturee').length,
   };
 
   const recent = demandes.slice(0, 8);
@@ -58,10 +61,10 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total demandes" value={stats.total} color="bg-blue-50 text-blue-600" icon="📋" />
-        <StatCard label="En attente" value={stats.attente} color="bg-yellow-50 text-yellow-600" icon="⏳" />
-        <StatCard label="En cours" value={stats.enCours} color="bg-green-50 text-green-600" icon="⚙️" />
-        <StatCard label="Arrêts temp." value={stats.arret} color="bg-red-50 text-red-600" icon="⏸️" />
+        <StatCard label="Total demandes"  value={stats.total}   color="bg-blue-50 text-blue-600"   icon="📋" onClick={() => navigate('/demandes')} />
+        <StatCard label="En attente"       value={stats.attente} color="bg-yellow-50 text-yellow-600" icon="⏳" onClick={() => navigate('/demandes?filter=attente')} />
+        <StatCard label="En cours"         value={stats.enCours} color="bg-green-50 text-green-600"  icon="⚙️" onClick={() => navigate('/demandes?filter=en_cours')} />
+        <StatCard label="Arrêts temp."     value={stats.arret}   color="bg-red-50 text-red-600"      icon="⏸️" onClick={() => navigate('/demandes?filter=arret_temporaire')} />
       </div>
 
       {/* Recent demandes */}
@@ -95,10 +98,17 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {recent.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                {recent.map((d) => {
+                  const isAssistant = user && d.assistantChargeTravauxId === user.id && d.chargeTravaux?.id !== user.id;
+                  return (
+                  <tr
+                    key={d.id}
+                    onClick={() => navigate(`/demandes/${d.id}`)}
+                    className="hover:bg-blue-50 cursor-pointer transition-colors"
+                  >
                     <td className="py-3">
-                      <Link to={`/demandes/${d.id}`} className="text-steg-primary font-mono font-medium hover:underline">{d.numero}</Link>
+                      <div className="font-mono font-medium text-steg-primary">{d.numero}</div>
+                      {isAssistant && <div className="text-xs text-purple-600 font-medium">Assistant CT</div>}
                     </td>
                     <td className="py-3 max-w-xs truncate text-gray-700">{d.designationOperation}</td>
                     <td className="py-3 capitalize text-gray-600">{d.regimeType?.replace('_', ' ')}</td>
@@ -108,7 +118,8 @@ export default function Dashboard() {
                       <span className={`badge-${d.status}`}>{STATUT_LABELS[d.status]}</span>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const {
   getAll, getOne, create, initAttestation,
-  arretTemporaire, reprendreOperations, changementCharge, updateAssistant, adminUpdateStatus,
+  arretTemporaire, reprendreOperations, changementCharge, updateAssistant, adminUpdateStatus, adminDelete,
 } = require('../controllers/demandes.controller');
 const { authenticate } = require('../middleware/auth');
 
@@ -16,4 +16,5 @@ router.post('/:id/reprendre', reprendreOperations);
 router.post('/:id/changement-charge', changementCharge);
 router.patch('/:id/assistant', updateAssistant);
 router.patch('/:id/status', adminUpdateStatus);
+router.delete('/:id', adminDelete);
 module.exports = router;

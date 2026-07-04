@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 const ROLE_LABELS = {
   admin: 'Administrateur', charge_travaux: 'Chargé de Travaux',
@@ -25,6 +26,7 @@ export default function GestionUtilisateurs() {
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null); // { id, nom }
 
   const fetchUsers = () => {
     setLoading(true);
@@ -57,6 +59,18 @@ export default function GestionUtilisateurs() {
     catch { alert('Erreur'); }
   };
 
+  const handleDelete = async () => {
+    if (!confirmDelete) return;
+    try {
+      await api.delete(`/users/${confirmDelete.id}`);
+      setConfirmDelete(null);
+      fetchUsers();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Erreur lors de la suppression');
+      setConfirmDelete(null);
+    }
+  };
+
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
 
   return (
@@ -75,10 +89,10 @@ export default function GestionUtilisateurs() {
               <thead>
                 <tr className="text-left text-gray-500 border-b border-gray-200">
                   <th className="pb-3 pr-4 font-medium">Utilisateur</th>
-                  <th className="pb-3 pr-4 font-medium">Email</th>
-                  <th className="pb-3 pr-4 font-medium">Rôle</th>
                   <th className="pb-3 pr-4 font-medium">Matricule</th>
+                  <th className="pb-3 pr-4 font-medium">Rôle</th>
                   <th className="pb-3 pr-4 font-medium">Centrale</th>
+                  <th className="pb-3 pr-4 font-medium">Email</th>
                   <th className="pb-3 pr-4 font-medium">Statut</th>
                   <th className="pb-3 font-medium">Actions</th>
                 </tr>
@@ -89,13 +103,13 @@ export default function GestionUtilisateurs() {
                     <td className="py-3 pr-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-steg-secondary rounded-full flex items-center justify-center text-white text-xs font-bold">{u.prenom?.[0]}{u.nom?.[0]}</div>
-                        <div><div className="font-medium text-gray-900">{u.prenom} {u.nom}</div></div>
+                        <div className="font-medium text-gray-900">{u.prenom} {u.nom}</div>
                       </div>
                     </td>
-                    <td className="py-3 pr-4 text-gray-500">{u.email}</td>
+                    <td className="py-3 pr-4 font-mono text-sm font-semibold text-gray-700">{u.matricule || '—'}</td>
                     <td className="py-3 pr-4"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span></td>
-                    <td className="py-3 pr-4 text-gray-400 font-mono text-xs">{u.matricule || '—'}</td>
                     <td className="py-3 pr-4 text-gray-500 text-xs">{u.centrale}</td>
+                    <td className="py-3 pr-4 text-gray-400 text-xs">{u.email}</td>
                     <td className="py-3 pr-4">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${u.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                         {u.active ? 'Actif' : 'Inactif'}
@@ -104,8 +118,14 @@ export default function GestionUtilisateurs() {
                     <td className="py-3">
                       <div className="flex gap-2">
                         <button onClick={() => openEdit(u)} className="text-xs text-steg-primary hover:underline">Modifier</button>
-                        <button onClick={() => handleToggle(u)} className={`text-xs hover:underline ${u.active ? 'text-red-500' : 'text-green-600'}`}>
+                        <button onClick={() => handleToggle(u)} className={`text-xs hover:underline ${u.active ? 'text-orange-500' : 'text-green-600'}`}>
                           {u.active ? 'Désactiver' : 'Activer'}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete({ id: u.id, nom: `${u.prenom} ${u.nom}` })}
+                          className="text-xs text-red-600 hover:underline font-medium"
+                        >
+                          Supprimer
                         </button>
                       </div>
                     </td>
@@ -117,18 +137,46 @@ export default function GestionUtilisateurs() {
         )}
       </div>
 
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title="Supprimer l'utilisateur"
+        message={`Êtes-vous sûr de vouloir supprimer définitivement ${confirmDelete?.nom} ? Toutes ses demandes et données associées seront également supprimées. Cette action est irréversible.`}
+        confirmLabel="Supprimer définitivement"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
+
       {modal === 'form' && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6">
             <h3 className="text-lg font-bold mb-5">{editId ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'}</h3>
             {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{error}</div>}
             <form onSubmit={handleSave} className="space-y-4">
+              {/* Identifiants de connexion */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-3">
+                <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Identifiants de connexion</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Matricule *</label>
+                    <input
+                      required
+                      className="input-field font-mono"
+                      value={form.matricule}
+                      onChange={(e) => setForm((p) => ({ ...p, matricule: e.target.value.toUpperCase() }))}
+                      placeholder="Ex: CT001"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Mot de passe {editId ? '(vide = inchangé)' : '*'}</label>
+                    <input type="password" required={!editId} className="input-field" value={form.password} onChange={set('password')} placeholder="••••••••" />
+                  </div>
+                </div>
+              </div>
+              {/* Informations personnelles */}
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="label">Prénom *</label><input required className="input-field" value={form.prenom} onChange={set('prenom')} /></div>
                 <div><label className="label">Nom *</label><input required className="input-field" value={form.nom} onChange={set('nom')} /></div>
               </div>
-              <div><label className="label">Email *</label><input required type="email" className="input-field" value={form.email} onChange={set('email')} /></div>
-              <div><label className="label">Mot de passe {editId ? '(laisser vide pour ne pas changer)' : '*'}</label><input type="password" required={!editId} className="input-field" value={form.password} onChange={set('password')} placeholder="••••••••" /></div>
               <div>
                 <label className="label">Rôle *</label>
                 <select required className="input-field" value={form.role} onChange={set('role')}>
@@ -136,8 +184,8 @@ export default function GestionUtilisateurs() {
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="label">Matricule *</label><input required className="input-field" value={form.matricule} onChange={set('matricule')} placeholder="Ex: CT001" /></div>
                 <div><label className="label">Centrale</label><input className="input-field" value={form.centrale} onChange={set('centrale')} /></div>
+                <div><label className="label">Email *</label><input required type="email" className="input-field" value={form.email} onChange={set('email')} /></div>
               </div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={() => setModal(null)} className="btn-outline">Annuler</button>

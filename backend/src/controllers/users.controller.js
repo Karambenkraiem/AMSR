@@ -25,8 +25,13 @@ const create = async (req, res) => {
   const { nom, prenom, email, role, matricule, centrale, password } = req.body;
   if (!nom || !prenom || !email || !role || !matricule || !password) return res.status(400).json({ error: 'Champs requis manquants' });
 
-  const existing = await prisma.user.findFirst({ where: { OR: [{ email }, { matricule }] } });
-  if (existing) return res.status(400).json({ error: 'Email ou matricule déjà utilisé' });
+  const existing = await prisma.user.findFirst({
+    where: { OR: [{ email }, { matricule }] },
+  });
+  if (existing) {
+    if (existing.email === email) return res.status(400).json({ error: 'Email déjà utilisé' });
+    return res.status(400).json({ error: 'Matricule déjà utilisé' });
+  }
 
   const hashed = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
@@ -60,8 +65,32 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   const { id } = req.params;
-  await prisma.user.update({ where: { id: parseInt(id) }, data: { active: false } });
-  res.json({ message: 'Utilisateur désactivé' });
+  const uid = parseInt(id);
+
+  if (req.user.id === uid) return res.status(400).json({ error: 'Impossible de supprimer votre propre compte' });
+
+  // Suppression en cascade manuelle (ordre FK)
+  await prisma.notification.deleteMany({ where: { userId: uid } });
+  await prisma.delegation.deleteMany({ where: { OR: [{ delegantId: uid }, { delegueId: uid }] } });
+
+  // Détacher les demandes où cet utilisateur est assistant
+  await prisma.demande.updateMany({ where: { assistantChargeTravauxId: uid }, data: { assistantChargeTravauxId: null, assistantNom: null } });
+
+  // Si CT principal sur une demande → supprimer toute la chaîne
+  const demandes = await prisma.demande.findMany({ where: { chargeTravauxId: uid }, select: { id: true } });
+  for (const d of demandes) {
+    const att = await prisma.attestation.findUnique({ where: { demandeId: d.id } });
+    if (att) {
+      await prisma.interruption.deleteMany({ where: { attestationId: att.id } });
+      await prisma.changementCharge.deleteMany({ where: { attestationId: att.id } });
+      await prisma.attestation.delete({ where: { id: att.id } });
+    }
+    await prisma.notification.deleteMany({ where: { demandeId: d.id } });
+    await prisma.demande.delete({ where: { id: d.id } });
+  }
+
+  await prisma.user.delete({ where: { id: uid } });
+  res.json({ message: 'Utilisateur supprimé définitivement' });
 };
 
 module.exports = { getAll, getByRole, create, update, remove };

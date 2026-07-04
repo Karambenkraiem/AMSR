@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { format } from 'date-fns';
@@ -16,36 +16,54 @@ const REGIME_LABELS = {
   essais: 'Essais', requisition: 'Réquisition', interventions: 'Interventions',
 };
 
+// Groupes de statuts pour le filtre "attente" du dashboard
+const ATTENTE_STATUTS = ['soumise', 'en_cours_attestation', 'accord_exploitation', 'regime_execute'];
+
 export default function ListeDemandes() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [demandes, setDemandes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
+  const [filterStatus, setFilterStatus] = useState(() => {
+    const f = searchParams.get('filter');
+    // "attente" est un groupe, pas un statut unique → on le gère dans le filtre
+    return f && f !== 'attente' ? f : '';
+  });
+  const [filterAttente, setFilterAttente] = useState(() => searchParams.get('filter') === 'attente');
 
   useEffect(() => {
     api.get('/demandes').then((res) => setDemandes(res.data)).finally(() => setLoading(false));
   }, []);
 
   const filtered = demandes.filter((d) => {
-    const matchSearch = !search || d.numero.toLowerCase().includes(search.toLowerCase()) ||
+    const matchSearch = !search ||
+      d.numero.toLowerCase().includes(search.toLowerCase()) ||
       d.designationOperation.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = !filterStatus || d.status === filterStatus;
+    const matchStatus = filterAttente
+      ? ATTENTE_STATUTS.includes(d.status)
+      : !filterStatus || d.status === filterStatus;
     return matchSearch && matchStatus;
   });
+
+  const handleStatusChange = (val) => {
+    setFilterAttente(false);
+    setFilterStatus(val);
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Demandes de Mise Sous Régime</h1>
-        {['charge_travaux', 'admin'].includes(user?.role) && (
+        {['charge_travaux', 'admin', 'chef_maintenance', 'charge_consignation'].includes(user?.role) && (
           <Link to="/demandes/nouvelle" className="btn-primary">+ Nouvelle demande</Link>
         )}
       </div>
 
       <div className="card">
         {/* Filters */}
-        <div className="flex gap-4 mb-6">
+        <div className="flex gap-4 mb-6 flex-wrap">
           <input
             type="text"
             placeholder="Rechercher par numéro ou opération..."
@@ -53,10 +71,26 @@ export default function ListeDemandes() {
             onChange={(e) => setSearch(e.target.value)}
             className="input-field max-w-sm"
           />
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="input-field max-w-xs">
+          <select
+            value={filterAttente ? 'attente' : filterStatus}
+            onChange={(e) => {
+              if (e.target.value === 'attente') { setFilterAttente(true); setFilterStatus(''); }
+              else handleStatusChange(e.target.value);
+            }}
+            className="input-field max-w-xs"
+          >
             <option value="">Tous les statuts</option>
+            <option value="attente">En attente (toutes étapes)</option>
             {Object.entries(STATUT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
+          {(filterStatus || filterAttente || search) && (
+            <button
+              onClick={() => { setSearch(''); setFilterStatus(''); setFilterAttente(false); }}
+              className="text-sm text-gray-400 hover:text-gray-600 underline"
+            >
+              Effacer les filtres
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -77,14 +111,22 @@ export default function ListeDemandes() {
                   <th className="pb-3 pr-4 font-medium">Chargé de Travaux</th>
                   <th className="pb-3 pr-4 font-medium">Date soumission</th>
                   <th className="pb-3 pr-4 font-medium">Statut</th>
-                  <th className="pb-3 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filtered.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                {filtered.map((d) => {
+                  const isAssistant = user && d.assistantChargeTravauxId === user.id && d.chargeTravaux?.id !== user.id;
+                  return (
+                  <tr
+                    key={d.id}
+                    onClick={() => navigate(`/demandes/${d.id}`)}
+                    className="hover:bg-blue-50 cursor-pointer transition-colors"
+                  >
                     <td className="py-3 pr-4">
-                      <span className="font-mono font-semibold text-steg-primary">{d.numero}</span>
+                      <div className="font-mono font-semibold text-steg-primary">{d.numero}</div>
+                      {isAssistant && (
+                        <div className="text-xs text-purple-600 font-medium mt-0.5">Assistant CT</div>
+                      )}
                     </td>
                     <td className="py-3 pr-4 max-w-xs">
                       <div className="truncate text-gray-700" title={d.designationOperation}>{d.designationOperation}</div>
@@ -96,11 +138,9 @@ export default function ListeDemandes() {
                     <td className="py-3 pr-4">
                       <span className={`badge-${d.status}`}>{STATUT_LABELS[d.status]}</span>
                     </td>
-                    <td className="py-3">
-                      <Link to={`/demandes/${d.id}`} className="text-steg-primary hover:underline text-xs font-medium">Voir détail</Link>
-                    </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

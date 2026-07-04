@@ -7,6 +7,7 @@ import { fr } from 'date-fns/locale';
 import { useReactToPrint } from 'react-to-print';
 import DemandePDF from '../../components/pdf/DemandePDF';
 import AttestationPDF from '../../components/pdf/AttestationPDF';
+import ConfirmDialog from '../../components/ConfirmDialog';
 
 const STATUT_LABELS = {
   soumise: 'Soumise', en_cours_attestation: 'Attestation en cours',
@@ -41,14 +42,21 @@ const Checkbox = ({ checked, label }) => (
   </div>
 );
 
-const WorkflowStep = ({ number, label, done, active, date, user: stepUser }) => (
+const WorkflowStep = ({ number, label, done, active, date, user: stepUser, pendingRole }) => (
   <div className={`flex items-start gap-3 ${active ? 'opacity-100' : done ? 'opacity-100' : 'opacity-40'}`}>
     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5 ${done ? 'bg-green-500 text-white' : active ? 'bg-steg-primary text-white animate-pulse' : 'bg-gray-200 text-gray-500'}`}>
       {done ? '✓' : number}
     </div>
     <div className="flex-1 min-w-0">
       <div className={`text-sm font-medium ${done ? 'text-green-700' : active ? 'text-steg-primary' : 'text-gray-500'}`}>{label}</div>
-      {done && stepUser && <div className="text-xs text-gray-400 mt-0.5">{stepUser.prenom} {stepUser.nom} — {date && format(new Date(date), 'dd/MM/yyyy HH:mm')}</div>}
+      {done && stepUser && (
+        <div className="text-xs text-gray-400 mt-0.5">{stepUser.prenom} {stepUser.nom} — {date && format(new Date(date), 'dd/MM/yyyy HH:mm')}</div>
+      )}
+      {!done && active && pendingRole && (
+        <div className="text-xs text-amber-600 font-medium mt-0.5 flex items-center gap-1">
+          <span>⏳</span> En attente : <span className="font-semibold">{pendingRole}</span>
+        </div>
+      )}
     </div>
   </div>
 );
@@ -58,6 +66,7 @@ export default function DetailDemande() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [demande, setDemande] = useState(null);
+  const [confirmDeleteDemande, setConfirmDeleteDemande] = useState(false);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [modal, setModal] = useState(null);
@@ -118,12 +127,10 @@ export default function DetailDemande() {
     || user.role === 'chef_centrale'
     || user.role === 'chef_maintenance'
     || user.role === 'charge_consignation';
-  const isAssistantCT = user.id === demande.assistantChargeTravauxId;
-  const canTravaux = isMainCT || isAssistantCT;
+  const isAssistantCT = user.id === demande.assistantChargeTravauxId && user.id !== demande.chargeTravauxId;
 
-  // Seul le CT qui a fait le régime accepté, ou le CT actuel (après changement), ou chef centrale peut terminer
+  // Seul le CT affecté à cette demande (ou chef_centrale/admin pour cas exceptionnels)
   const canTerminer =
-    user.id === att?.regimeDelivreId ||
     user.id === demande.chargeTravauxId ||
     user.role === 'chef_centrale' ||
     user.role === 'admin';
@@ -132,20 +139,21 @@ export default function DetailDemande() {
   const assistantConfirmed = att?.regimeDelivreDate != null && ['en_cours','arret_temporaire','operation_terminee','cloturee'].includes(s);
 
   const workflowSteps = [
-    { label: 'Demande soumise', done: true, user: demande.chargeTravaux, date: demande.createdAt },
-    { label: 'Attestation remplie par chargé consignation', done: ['accord_exploitation','regime_execute','attente_confirmation_assistant','en_cours','arret_temporaire','operation_terminee','cloturee'].includes(s), user: null, date: att?.createdAt },
-    { label: 'Accord du chargé d\'exploitation', done: att?.accordDate != null, user: att?.accordExploitation, date: att?.accordDate },
-    { label: 'Régime exécuté (consignation OK)', done: att?.regimeExecuteDate != null, user: att?.regimeExecute, date: att?.regimeExecuteDate },
-    { label: 'Régime accepté par chargé de travaux', done: att?.regimeDelivreId != null, user: att?.regimeDelivre, date: s === 'attente_confirmation_assistant' ? null : att?.regimeDelivreDate },
+    { label: 'Demande soumise', done: true, user: demande.chargeTravaux, date: demande.createdAt, pendingRole: null },
+    { label: 'Attestation remplie par chargé consignation', done: ['accord_exploitation','regime_execute','attente_confirmation_assistant','en_cours','arret_temporaire','operation_terminee','cloturee'].includes(s), user: null, date: att?.createdAt, pendingRole: 'Chargé de Consignation' },
+    { label: 'Accord du chargé d\'exploitation', done: att?.accordDate != null, user: att?.accordExploitation, date: att?.accordDate, pendingRole: 'Chargé d\'Exploitation' },
+    { label: 'Régime exécuté (consignation OK)', done: att?.regimeExecuteDate != null, user: att?.regimeExecute, date: att?.regimeExecuteDate, pendingRole: 'Chargé de Consignation' },
+    { label: 'Régime accepté par chargé de travaux', done: att?.regimeDelivreId != null, user: att?.regimeDelivre, date: s === 'attente_confirmation_assistant' ? null : att?.regimeDelivreDate, pendingRole: 'Chargé de Travaux' },
     ...(hasAssistantStep ? [{
       label: `Confirmation de l'assistant (${att?.assistantDelivreNom || '—'})`,
       done: assistantConfirmed,
       user: assistantConfirmed ? att?.assistantDelivre : null,
       date: assistantConfirmed ? att?.regimeDelivreDate : null,
+      pendingRole: `Assistant CT — ${att?.assistantDelivreNom || ''}`,
     }] : []),
-    { label: 'Travaux en cours', done: ['en_cours','arret_temporaire','operation_terminee','cloturee'].includes(s), user: null, date: att?.regimeDelivreDate },
-    { label: 'Opération terminée', done: att?.operationTermineeDate != null, user: att?.operationTerminee, date: att?.operationTermineeDate },
-    { label: 'Régime levé (clôture)', done: s === 'cloturee', user: att?.regimeLeve, date: att?.regimeleveDate },
+    { label: 'Travaux en cours', done: ['en_cours','arret_temporaire','operation_terminee','cloturee'].includes(s), user: null, date: att?.regimeDelivreDate, pendingRole: 'Chargé de Travaux' },
+    { label: 'Opération terminée', done: att?.operationTermineeDate != null, user: att?.operationTerminee, date: att?.operationTermineeDate, pendingRole: 'Chargé de Travaux' },
+    { label: 'Régime levé (clôture)', done: s === 'cloturee', user: att?.regimeLeve, date: att?.regimeleveDate, pendingRole: 'Chargé de Consignation' },
   ];
 
   return (
@@ -216,7 +224,7 @@ export default function DetailDemande() {
                     </div>
                   )}
                 </div>
-                {canTravaux && !['cloturee', 'rejetee', 'operation_terminee'].includes(s) && (
+                {isMainCT && !['cloturee', 'rejetee', 'operation_terminee'].includes(s) && (
                   <button
                     onClick={() => {
                       setFormData({ assistantId: demande.assistantChargeTravauxId?.toString() || '' });
@@ -343,7 +351,7 @@ export default function DetailDemande() {
             <SectionTitle>Progression du workflow</SectionTitle>
             <div className="space-y-4">
               {workflowSteps.map((step, i) => (
-                <WorkflowStep key={i} number={i + 1} label={step.label} done={step.done} active={!step.done && (i === 0 || workflowSteps[i - 1]?.done)} date={step.date} user={step.user} />
+                <WorkflowStep key={i} number={i + 1} label={step.label} done={step.done} active={!step.done && (i === 0 || workflowSteps[i - 1]?.done)} date={step.date} user={step.user} pendingRole={step.pendingRole} />
               ))}
             </div>
 
@@ -383,9 +391,34 @@ export default function DetailDemande() {
                   </button>
                 </div>
                 <div className="text-xs text-red-400 mt-1">⚠ Action irréversible — modifie demande et attestation</div>
+                <div className="mt-3 pt-3 border-t border-red-100">
+                  <button
+                    onClick={() => setConfirmDeleteDemande(true)}
+                    className="w-full px-3 py-2 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
+                  >
+                    🗑 Supprimer cette demande définitivement
+                  </button>
+                </div>
               </div>
             )}
           </div>
+
+          <ConfirmDialog
+            open={confirmDeleteDemande}
+            title="Supprimer la demande"
+            message={`Supprimer définitivement la demande N° ${demande?.numero} ? L'attestation et toutes les données associées seront également supprimées. Cette action est irréversible.`}
+            confirmLabel="Supprimer définitivement"
+            onConfirm={async () => {
+              try {
+                await api.delete(`/demandes/${demande.id}`);
+                navigate('/');
+              } catch (err) {
+                alert(err.response?.data?.error || 'Erreur lors de la suppression');
+                setConfirmDeleteDemande(false);
+              }
+            }}
+            onCancel={() => setConfirmDeleteDemande(false)}
+          />
 
           {/* Actions */}
           <div className="card">
@@ -434,18 +467,18 @@ export default function DetailDemande() {
                 </div>
               )}
 
-              {/* Chargé travaux: arrêt temporaire */}
-              {canTravaux && s === 'en_cours' && (
+              {/* Chargé travaux principal: arrêt temporaire */}
+              {isMainCT && s === 'en_cours' && (
                 <button onClick={() => setModal('arret')} className="btn-danger w-full text-sm">⏸️ Arrêt temporaire</button>
               )}
 
               {/* Reprendre après arrêt */}
-              {canTravaux && s === 'arret_temporaire' && att?.interruptions?.length > 0 && (
+              {isMainCT && s === 'arret_temporaire' && att?.interruptions?.length > 0 && (
                 <button onClick={() => setModal('reprendre')} className="btn-primary w-full text-sm">▶️ Reprendre les opérations</button>
               )}
 
               {/* Changement de chargé — uniquement après démarrage */}
-              {canTravaux && ['en_cours', 'arret_temporaire'].includes(s) && (
+              {isMainCT && ['en_cours', 'arret_temporaire'].includes(s) && (
                 <button onClick={() => setModal('changement')} className="btn-outline w-full text-sm">👤 Changement de chargé</button>
               )}
 
@@ -613,35 +646,87 @@ export default function DetailDemande() {
             {/* Changement chargé */}
             {modal === 'changement' && (
               <div>
-                <h3 className="text-lg font-bold mb-4">Changement de chargé</h3>
+                <h3 className="text-lg font-bold mb-4">Changement de chargé de travaux</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="label">Type de rôle à remplacer</label>
-                    <select className="input-field" value={formData.typeRole || ''} onChange={(e) => setFormData({ ...formData, typeRole: e.target.value })}>
-                      <option value="">— Sélectionner —</option>
-                      <option value="charge_travaux">Chargé de Travaux</option>
-                      <option value="charge_essais">Chargé d'Essais</option>
-                      <option value="charge_interventions">Chargé d'Interventions</option>
-                      <option value="assistant">Assistant</option>
+                    <label className="label">Nouveau chargé de travaux</label>
+                    <select
+                      className="input-field"
+                      value={formData.remplacerId || ''}
+                      onChange={(e) => {
+                        const selected = users.find((u) => u.id === parseInt(e.target.value));
+                        setFormData({
+                          ...formData,
+                          typeRole: 'charge_travaux',
+                          remplacerId: e.target.value,
+                          remplacantNom: selected?.nom || '',
+                          remplacantPrenom: selected?.prenom || '',
+                        });
+                      }}
+                    >
+                      <option value="">— Sélectionner un chargé de travaux —</option>
+                      {users
+                        .filter((u) => u.active && u.role === 'charge_travaux' && u.id !== demande.chargeTravauxId)
+                        .map((u) => (
+                          <option key={u.id} value={u.id}>{u.prenom} {u.nom} — {u.matricule}</option>
+                        ))}
                     </select>
                   </div>
                   <div>
-                    <label className="label">Remplacé par (sélectionner)</label>
-                    <select className="input-field" value={formData.remplacerId || ''} onChange={(e) => {
-                      const selected = users.find((u) => u.id === parseInt(e.target.value));
-                      setFormData({ ...formData, remplacerId: e.target.value, remplacantNom: selected?.nom || '', remplacantPrenom: selected?.prenom || '' });
-                    }}>
-                      <option value="">— Sélectionner un utilisateur —</option>
-                      {users.filter((u) => u.active && u.id !== demande.chargeTravauxId).map((u) => (
-                        <option key={u.id} value={u.id}>{u.prenom} {u.nom} ({u.role.replace('_', ' ')})</option>
-                      ))}
-                    </select>
+                    <label className="label">Date d'effet</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="date"
+                        className="input-field flex-1"
+                        value={formData.dateEffetDate || ''}
+                        onChange={(e) => {
+                          const d = e.target.value;
+                          const hh = (formData.dateEffetHH || '00').padStart(2, '0');
+                          const mm = (formData.dateEffetMM || '00').padStart(2, '0');
+                          setFormData({ ...formData, dateEffetDate: d, dateEffet: d ? `${d}T${hh}:${mm}` : '' });
+                        }}
+                      />
+                      <input
+                        className="input-field text-center w-14"
+                        placeholder="HH"
+                        maxLength={2}
+                        value={formData.dateEffetHH || ''}
+                        onChange={(e) => setFormData({ ...formData, dateEffetHH: e.target.value })}
+                        onBlur={(e) => {
+                          const v = Math.min(23, Math.max(0, parseInt(e.target.value) || 0));
+                          const hh = String(v).padStart(2, '0');
+                          const mm = (formData.dateEffetMM || '00').padStart(2, '0');
+                          const d = formData.dateEffetDate || '';
+                          setFormData({ ...formData, dateEffetHH: hh, dateEffet: d ? `${d}T${hh}:${mm}` : '' });
+                        }}
+                      />
+                      <span className="text-gray-400 font-bold">:</span>
+                      <input
+                        className="input-field text-center w-14"
+                        placeholder="MM"
+                        maxLength={2}
+                        value={formData.dateEffetMM || ''}
+                        onChange={(e) => setFormData({ ...formData, dateEffetMM: e.target.value })}
+                        onBlur={(e) => {
+                          const v = Math.min(59, Math.max(0, parseInt(e.target.value) || 0));
+                          const mm = String(v).padStart(2, '0');
+                          const hh = (formData.dateEffetHH || '00').padStart(2, '0');
+                          const d = formData.dateEffetDate || '';
+                          setFormData({ ...formData, dateEffetMM: mm, dateEffet: d ? `${d}T${hh}:${mm}` : '' });
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div><label className="label">Date d'effet</label><input type="datetime-local" className="input-field" value={formData.dateEffet || ''} onChange={(e) => setFormData({ ...formData, dateEffet: e.target.value })} /></div>
                 </div>
                 <div className="flex gap-3 justify-end mt-4">
                   <button onClick={() => setModal(null)} className="btn-outline">Annuler</button>
-                  <button onClick={() => doAction(async (d) => { await api.post(`/demandes/${demande.id}/changement-charge`, d); }, formData)} disabled={actionLoading || !formData.remplacerId || !formData.typeRole} className="btn-primary">Confirmer le changement</button>
+                  <button
+                    onClick={() => doAction(async (d) => { await api.post(`/demandes/${demande.id}/changement-charge`, d); }, formData)}
+                    disabled={actionLoading || !formData.remplacerId}
+                    className="btn-primary"
+                  >
+                    Confirmer le changement
+                  </button>
                 </div>
               </div>
             )}
