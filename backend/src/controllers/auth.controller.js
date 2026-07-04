@@ -13,10 +13,10 @@ const getActiveDelegatedRoles = async (userId) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Email et mot de passe requis' });
+  const { matricule, password } = req.body;
+  if (!matricule || !password) return res.status(400).json({ error: 'Matricule et mot de passe requis' });
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { matricule } });
   if (!user || !user.active) return res.status(401).json({ error: 'Identifiants incorrects' });
 
   const valid = await bcrypt.compare(password, user.password);

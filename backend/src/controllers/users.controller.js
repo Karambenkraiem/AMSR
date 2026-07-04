@@ -23,10 +23,10 @@ const getByRole = async (req, res) => {
 
 const create = async (req, res) => {
   const { nom, prenom, email, role, matricule, centrale, password } = req.body;
-  if (!nom || !prenom || !email || !role || !password) return res.status(400).json({ error: 'Champs requis manquants' });
+  if (!nom || !prenom || !email || !role || !matricule || !password) return res.status(400).json({ error: 'Champs requis manquants' });
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) return res.status(400).json({ error: 'Email déjà utilisé' });
+  const existing = await prisma.user.findFirst({ where: { OR: [{ email }, { matricule }] } });
+  if (existing) return res.status(400).json({ error: 'Email ou matricule déjà utilisé' });
 
   const hashed = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
