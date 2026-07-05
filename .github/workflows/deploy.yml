@@ -103,8 +103,8 @@ jobs:
             cd ${{ secrets.VPS_PROJECT_PATH }}
             git pull origin main
             mkdir -p downloads
-            docker compose -f docker-compose.prod.yml build
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml build --no-cache
+            docker compose -f docker-compose.prod.yml up -d --force-recreate
             docker image prune -f
 
       - name: Upload APK via SCP natif
