@@ -35,6 +35,7 @@ export default function Layout() {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
+    <>
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shrink-0`}>
@@ -127,5 +128,6 @@ export default function Layout() {
     </div>
 
     <MobileAppBanner />
+    </>
   );
 }
