@@ -107,14 +107,20 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d
             docker image prune -f
 
-      - name: Upload APK to VPS
-        uses: appleboy/scp-action@v0.1.7
-        if: ${{ hashFiles('apk-output/amsr-steg.apk') != '' }}
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_SSH_PORT || 22 }}
-          source: "apk-output/amsr-steg.apk"
-          target: "${{ secrets.VPS_PROJECT_PATH }}/downloads/"
-          strip_components: 1
+      - name: Upload APK via SCP natif
+        if: hashFiles('apk-output/amsr-steg.apk') != ''
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_SSH_PORT || '22' }}
+        run: |
+          echo "$SSH_KEY" > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          PORT=${VPS_PORT:-22}
+          OPTS="-i /tmp/deploy_key -o StrictHostKeyChecking=no -o BatchMode=yes -p $PORT"
+          ssh $OPTS $VPS_USER@$VPS_HOST "mkdir -p ~/downloads"
+          scp -i /tmp/deploy_key -o StrictHostKeyChecking=no -P $PORT \
+            apk-output/amsr-steg.apk \
+            $VPS_USER@$VPS_HOST:~/downloads/amsr-steg.apk
+          rm -f /tmp/deploy_key
