@@ -40,7 +40,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('frontend/android/**/*.gradle*', 'frontend/android/**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -67,40 +67,32 @@ jobs:
       - name: Build APK (debug)
         working-directory: frontend/android
         run: ./gradlew assembleDebug --no-daemon
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Prepare APK for upload
+      - name: Prepare APK
         run: |
           mkdir -p apk-output
           cp frontend/android/app/build/outputs/apk/debug/app-debug.apk apk-output/amsr-steg.apk
-          echo "APK size: $(du -sh apk-output/amsr-steg.apk)"
 
-      - name: Create downloads directory on VPS
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_SSH_PORT || 22 }}
-          script: mkdir -p ${{ secrets.VPS_PROJECT_PATH }}/downloads
-
-      - name: Upload APK to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_SSH_PORT || 22 }}
-          source: "apk-output/amsr-steg.apk"
-          target: "${{ secrets.VPS_PROJECT_PATH }}/downloads/"
-          strip_components: 1
+          name: amsr-apk
+          path: apk-output/amsr-steg.apk
+          retention-days: 30
 
   deploy:
-    needs: test-build
+    needs: [test-build, build-apk]
+    if: always() && needs.test-build.result == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy over SSH
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: amsr-apk
+          path: apk-output
+        continue-on-error: true
+
+      - name: Deploy web app over SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -114,3 +106,15 @@ jobs:
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d
             docker image prune -f
+
+      - name: Upload APK to VPS
+        uses: appleboy/scp-action@v0.1.7
+        if: ${{ hashFiles('apk-output/amsr-steg.apk') != '' }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT || 22 }}
+          source: "apk-output/amsr-steg.apk"
+          target: "${{ secrets.VPS_PROJECT_PATH }}/downloads/"
+          strip_components: 1
