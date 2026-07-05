@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'amsr_app_banner_dismissed';
 
-// Liens à mettre à jour après publication sur les stores
 const LINKS = {
-  android: 'https://play.google.com/store/apps/details?id=tn.steg.amsr',
+  android: 'https://amsr.alkaramsoft.ovh/download/amsr-steg.apk',
   ios: 'https://apps.apple.com/app/amsr-steg/id000000000',
-  // Lien APK direct (à héberger sur le serveur) :
-  apk: 'https://amsr.alkaramsoft.ovh/download/amsr-steg.apk',
 };
 
 function getMobileOS() {
