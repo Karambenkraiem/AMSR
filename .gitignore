@@ -5,3 +5,10 @@ build/
 *.log
 .DS_Store
 prisma/migrations/
+
+# React Native (supprimé - remplacé par Capacitor)
+mobile/
+
+# Dossiers natifs générés par Capacitor (ne pas committer)
+frontend/android/
+frontend/ios/

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const APK_URL = 'https://amsr.alkaramsoft.ovh/download/amsr-steg.apk';
-const APPSTORE_URL = 'https://apps.apple.com/app/amsr-steg/id000000000'; // à remplacer après publication
+const APPSTORE_URL = 'https://apps.apple.com/app/amsr-steg/id000000000';
 
 function getMobileOS() {
   const ua = navigator.userAgent;
@@ -12,7 +12,13 @@ function getMobileOS() {
   return null;
 }
 
+// true quand l'app tourne dans la coque Capacitor (native Android/iOS)
+const isNativeApp = () => !!(window.Capacitor?.isNativePlatform?.());
+
 function AppDownloadSection() {
+  // Ne pas afficher si l'utilisateur est déjà dans l'app native Capacitor
+  if (isNativeApp()) return null;
+
   const os = getMobileOS();
 
   return (

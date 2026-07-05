@@ -19,6 +19,9 @@ export default function MobileAppBanner() {
   const [os, setOs] = useState(null);
 
   useEffect(() => {
+    // Ne pas afficher si l'utilisateur est déjà dans la coque native Capacitor
+    if (window.Capacitor?.isNativePlatform?.()) return;
+
     const dismissed = sessionStorage.getItem(STORAGE_KEY);
     if (dismissed) return;
 

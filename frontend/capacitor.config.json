@@ -1,0 +1,16 @@
+{
+  "appId": "tn.steg.amsr",
+  "appName": "AMSR STEG",
+  "webDir": "dist",
+  "server": {
+    "url": "https://amsr.alkaramsoft.ovh",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#003366"
+  },
+  "ios": {
+    "backgroundColor": "#003366"
+  }
+}
