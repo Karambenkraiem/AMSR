@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import NotificationBell from './NotificationBell';
+import AppInstallPrompt from './AppInstallPrompt';
 
 const ROLE_LABELS = {
   admin: 'Administrateur',
@@ -30,6 +31,7 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showInstall, setShowInstall] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -84,6 +86,18 @@ export default function Layout() {
           )}
         </nav>
 
+        {/* Bouton télécharger l'app */}
+        <div className="px-3 pb-2">
+          <button
+            onClick={() => setShowInstall(true)}
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-steg-primary transition-colors text-sm font-medium"
+            title="Télécharger l'application mobile"
+          >
+            <span className="text-base">📱</span>
+            {sidebarOpen && <span>Application mobile</span>}
+          </button>
+        </div>
+
         {/* User */}
         <div className="p-3 border-t border-gray-200">
           {sidebarOpen ? (
@@ -124,5 +138,13 @@ export default function Layout() {
         </main>
       </div>
     </div>
+
+    {showInstall && (
+      <AppInstallPrompt
+        forceShow
+        key={Date.now()}
+        onClose={() => setShowInstall(false)}
+      />
+    )}
   );
 }

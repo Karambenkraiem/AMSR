@@ -70,22 +70,26 @@ function Step({ n, text }) {
 }
 
 /* ── composant principal ─────────────────────────────────────── */
-export default function AppInstallPrompt() {
+export default function AppInstallPrompt({ forceShow = false, onClose }) {
   const [show,    setShow]    = useState(false);
   const [os,      setOs]      = useState('desktop');
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     if (window.Capacitor?.isNativePlatform?.()) return;
+    // forceShow = ouvert depuis la sidebar (ignore localStorage)
+    if (forceShow) { setOs(detectOS()); setShow(true); return; }
     if (isDismissed()) return;
     const t = setTimeout(() => { setOs(detectOS()); setShow(true); }, 1200);
     return () => clearTimeout(t);
-  }, []);
+  }, [forceShow]);
 
   const dismiss = () => {
     setLeaving(true);
-    localStorage.setItem(DISMISSED_KEY, String(Date.now() + DISMISS_DAYS * 86400_000));
-    setTimeout(() => setShow(false), 320);
+    if (!forceShow) {
+      localStorage.setItem(DISMISSED_KEY, String(Date.now() + DISMISS_DAYS * 86400_000));
+    }
+    setTimeout(() => { setShow(false); onClose?.(); }, 320);
   };
 
   if (!show) return null;
