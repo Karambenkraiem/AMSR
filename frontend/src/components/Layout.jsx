@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import NotificationBell from './NotificationBell';
+import MobileAppBanner from './MobileAppBanner';
 
 const ROLE_LABELS = {
   admin: 'Administrateur',
@@ -124,5 +125,7 @@ export default function Layout() {
         </main>
       </div>
     </div>
+
+    <MobileAppBanner />
   );
 }
