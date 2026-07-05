@@ -1,0 +1,19 @@
+{
+  "name": "AMSR — STEG",
+  "short_name": "AMSR",
+  "description": "Attestation de Mise Sous Régime - Société Tunisienne de l'Électricité et du Gaz",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#003366",
+  "theme_color": "#003366",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/steg.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
