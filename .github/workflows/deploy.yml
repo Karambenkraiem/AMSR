@@ -105,8 +105,6 @@ jobs:
             mkdir -p downloads
             docker compose -f docker-compose.prod.yml build --no-cache
             docker compose -f docker-compose.prod.yml up -d --force-recreate
-            sleep 5
-            docker exec amsr_backend_prod node prisma/seed.js
             docker image prune -f
 
       - name: Upload APK via SCP natif
