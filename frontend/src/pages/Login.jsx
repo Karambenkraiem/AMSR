@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
+const DEMO_ACCOUNTS = [
+  { matricule: 'DEMO-EXP', password: 'Demo@2024', label: 'Chargé Exploitation', color: 'bg-blue-600',   icon: '⚡' },
+  { matricule: 'DEMO-TRV', password: 'Demo@2024', label: 'Chargé Travaux',      color: 'bg-orange-500', icon: '🔧' },
+  { matricule: 'DEMO-CSG', password: 'Demo@2024', label: 'Chargé Consignation', color: 'bg-green-600',  icon: '🔒' },
+  { matricule: 'DEMO-CHF', password: 'Demo@2024', label: 'Chef de Centrale',    color: 'bg-purple-600', icon: '👷' },
+];
+
 const APK_URL = 'https://amsr.alkaramsoft.ovh/download/amsr-steg.apk';
 const APPSTORE_URL = 'https://apps.apple.com/app/amsr-steg/id000000000';
 
@@ -89,6 +96,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(null);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -103,6 +112,19 @@ export default function Login() {
       setError(err.response?.data?.error || 'Identifiants incorrects');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loginAsDemo = async (account) => {
+    setDemoLoading(account.matricule);
+    setError('');
+    try {
+      await login(account.matricule, account.password);
+      navigate('/');
+    } catch {
+      setError('Compte démo indisponible — le déploiement est peut-être en cours.');
+    } finally {
+      setDemoLoading(null);
     }
   };
 
@@ -157,6 +179,41 @@ export default function Login() {
               {loading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
           </form>
+
+          {/* Section démo */}
+          <div className="mt-5 pt-5 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={() => setDemoOpen(o => !o)}
+              className="w-full flex items-center justify-between text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <span className="text-base">🎯</span>
+                Accès démo — cliquez pour tester
+              </span>
+              <span className={`transition-transform duration-200 ${demoOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+
+            {demoOpen && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {DEMO_ACCOUNTS.map(account => (
+                  <button
+                    key={account.matricule}
+                    type="button"
+                    onClick={() => loginAsDemo(account)}
+                    disabled={demoLoading !== null}
+                    className={`${account.color} hover:opacity-90 text-white rounded-xl px-3 py-3 text-left transition-opacity disabled:opacity-60`}
+                  >
+                    <div className="text-lg mb-0.5">{account.icon}</div>
+                    <div className="text-xs font-bold leading-tight">{account.label}</div>
+                    {demoLoading === account.matricule && (
+                      <div className="text-[10px] opacity-80 mt-0.5">Connexion...</div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <AppDownloadSection />
         </div>
