@@ -31,6 +31,11 @@ const IconApple = ({ cls = 'w-6 h-6' }) => (
     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
   </svg>
 );
+const IconWindows = ({ cls = 'w-6 h-6' }) => (
+  <svg viewBox="0 0 24 24" className={cls} fill="currentColor">
+    <path d="M3 5.5 10.5 4.4v7.1H3zm8.4-1.2L21 3v8.5h-9.6zM3 12.5h7.5v7.1L3 18.5zm8.4 0H21V21l-9.6-1.3z"/>
+  </svg>
+);
 const IconShare = () => (
   <svg viewBox="0 0 24 24" className="w-4 h-4 inline mx-0.5 -mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
@@ -199,7 +204,20 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
           {/* Desktop */}
           {!isMobile && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-600">Accédez à AMSR depuis votre smartphone :</p>
+              {nativePrompt && (
+                <button
+                  onClick={installNative}
+                  className="flex items-center gap-3 bg-gray-900 hover:bg-gray-700 text-white px-4 py-3.5 rounded-xl transition-colors w-full"
+                >
+                  <IconWindows cls="w-6 h-6 shrink-0" />
+                  <div>
+                    <div className="text-[10px] text-gray-400 uppercase tracking-wide leading-none">Installation directe</div>
+                    <div className="font-bold leading-tight">Installer sur cet ordinateur</div>
+                  </div>
+                </button>
+              )}
+
+              <p className="text-sm text-gray-600">Ou accédez à AMSR depuis votre smartphone :</p>
               <div className="grid grid-cols-2 gap-2">
                 <a href={APK_URL} className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white px-3 py-2.5 rounded-xl transition-colors">
                   <IconAndroid cls="w-5 h-5 shrink-0" />
@@ -210,6 +228,12 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
                   <div><div className="text-[9px] leading-none">Safari → Partager</div><div className="text-xs font-bold">iPhone / iPad</div></div>
                 </div>
               </div>
+
+              {!nativePrompt && (
+                <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+                  Ouvrez ce site dans Chrome ou Edge pour installer l'application sur cet ordinateur (Windows).
+                </p>
+              )}
             </div>
           )}
 

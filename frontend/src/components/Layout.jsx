@@ -96,10 +96,10 @@ export default function Layout() {
           <button
             onClick={() => setShowInstall(true)}
             className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-steg-primary transition-colors text-sm font-medium"
-            title="Télécharger l'application mobile"
+            title="Installer l'application (mobile ou PC)"
           >
             <span className="text-base">📱</span>
-            {sidebarOpen && <span>Application mobile</span>}
+            {sidebarOpen && <span>Installer l'application</span>}
           </button>
         </div>
 
