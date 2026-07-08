@@ -52,4 +52,14 @@ const authorize = (...roles) => (req, res, next) => {
   next();
 };
 
-module.exports = { authenticate, authorize, canActAs };
+// Rôles de consultation (vision) ou de commentaire uniquement — jamais d'action sur le workflow
+const READ_ONLY_ROLES = ['directeur', 'responsable_securite', 'guest', 'animateur_securite'];
+
+const denyReadOnly = (req, res, next) => {
+  if (READ_ONLY_ROLES.includes(req.user.role)) {
+    return res.status(403).json({ error: 'Votre rôle ne permet pas cette action' });
+  }
+  next();
+};
+
+module.exports = { authenticate, authorize, canActAs, denyReadOnly, READ_ONLY_ROLES };

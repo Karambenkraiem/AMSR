@@ -8,6 +8,7 @@ const demandesRoutes = require('./routes/demandes.routes');
 const attestationsRoutes = require('./routes/attestations.routes');
 const notificationsRoutes = require('./routes/notifications.routes');
 const delegationsRoutes = require('./routes/delegations.routes');
+const commentairesSecuriteRoutes = require('./routes/commentairesSecurite.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +23,7 @@ app.use('/api/demandes', demandesRoutes);
 app.use('/api/attestations', attestationsRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/delegations', delegationsRoutes);
+app.use('/api/commentaires-securite', commentairesSecuriteRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 

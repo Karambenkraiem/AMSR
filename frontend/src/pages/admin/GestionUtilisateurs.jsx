@@ -7,6 +7,10 @@ const ROLE_LABELS = {
   charge_consignation: 'Chargé de Consignation', charge_exploitation: 'Chargé d\'Exploitation',
   chef_centrale: 'Chef de Centrale',
   chef_maintenance: 'Chef Maintenance',
+  directeur: 'Directeur',
+  animateur_securite: 'Animateur Sécurité',
+  responsable_securite: 'Responsable Sécurité',
+  guest: 'Invité',
 };
 
 const ROLE_COLORS = {
@@ -14,6 +18,10 @@ const ROLE_COLORS = {
   charge_consignation: 'bg-yellow-100 text-yellow-800', charge_exploitation: 'bg-green-100 text-green-800',
   chef_centrale: 'bg-gray-100 text-gray-800',
   chef_maintenance: 'bg-orange-100 text-orange-800',
+  directeur: 'bg-indigo-100 text-indigo-800',
+  animateur_securite: 'bg-pink-100 text-pink-800',
+  responsable_securite: 'bg-purple-100 text-purple-800',
+  guest: 'bg-slate-100 text-slate-600',
 };
 
 const emptyForm = { nom: '', prenom: '', email: '', role: 'charge_travaux', matricule: '', centrale: 'Centrale Goulette 2', password: '', active: true };

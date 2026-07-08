@@ -72,6 +72,7 @@ const remove = async (req, res) => {
   // Suppression en cascade manuelle (ordre FK)
   await prisma.notification.deleteMany({ where: { userId: uid } });
   await prisma.delegation.deleteMany({ where: { OR: [{ delegantId: uid }, { delegueId: uid }] } });
+  await prisma.commentaireSecurite.deleteMany({ where: { auteurId: uid } });
 
   // Détacher les demandes où cet utilisateur est assistant
   await prisma.demande.updateMany({ where: { assistantChargeTravauxId: uid }, data: { assistantChargeTravauxId: null, assistantNom: null } });
@@ -83,9 +84,11 @@ const remove = async (req, res) => {
     if (att) {
       await prisma.interruption.deleteMany({ where: { attestationId: att.id } });
       await prisma.changementCharge.deleteMany({ where: { attestationId: att.id } });
+      await prisma.commentaireSecurite.deleteMany({ where: { attestationId: att.id } });
       await prisma.attestation.delete({ where: { id: att.id } });
     }
     await prisma.notification.deleteMany({ where: { demandeId: d.id } });
+    await prisma.commentaireSecurite.deleteMany({ where: { demandeId: d.id } });
     await prisma.demande.delete({ where: { id: d.id } });
   }
 

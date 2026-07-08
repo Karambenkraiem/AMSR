@@ -15,6 +15,10 @@ enum Role {
   charge_exploitation
   chef_centrale
   chef_maintenance
+  directeur
+  animateur_securite
+  responsable_securite
+  guest
 }
 
 enum RegimeType {
@@ -68,6 +72,7 @@ model User {
   changements                 ChangementCharge[] @relation("Remplace")
   delegationsAccordees        Delegation[]       @relation("Delegant")
   delegationsRecues           Delegation[]       @relation("Delegue")
+  commentairesSecurite        CommentaireSecurite[]
 }
 
 model Demande {
@@ -107,6 +112,7 @@ model Demande {
 
   attestation               Attestation?
   notifications             Notification[]
+  commentairesSecurite      CommentaireSecurite[]
 
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
@@ -159,6 +165,7 @@ model Attestation {
 
   changements          ChangementCharge[]
   interruptions        Interruption[]
+  commentairesSecurite CommentaireSecurite[]
 
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
@@ -225,4 +232,17 @@ model Notification {
   demande   Demande? @relation(fields: [demandeId], references: [id])
   demandeId Int?
   createdAt DateTime @default(now())
+}
+
+// Commentaires internes de l'animateur sécurité — jamais inclus dans les documents imprimés
+model CommentaireSecurite {
+  id            Int          @id @default(autoincrement())
+  demande       Demande?     @relation(fields: [demandeId], references: [id])
+  demandeId     Int?
+  attestation   Attestation? @relation(fields: [attestationId], references: [id])
+  attestationId Int?
+  auteur        User         @relation(fields: [auteurId], references: [id])
+  auteurId      Int
+  contenu       String
+  createdAt     DateTime     @default(now())
 }

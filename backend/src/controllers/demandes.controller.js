@@ -338,9 +338,11 @@ const adminDelete = async (req, res) => {
   if (demande.attestation) {
     await prisma.interruption.deleteMany({ where: { attestationId: demande.attestation.id } });
     await prisma.changementCharge.deleteMany({ where: { attestationId: demande.attestation.id } });
+    await prisma.commentaireSecurite.deleteMany({ where: { attestationId: demande.attestation.id } });
     await prisma.attestation.delete({ where: { id: demande.attestation.id } });
   }
   await prisma.notification.deleteMany({ where: { demandeId: did } });
+  await prisma.commentaireSecurite.deleteMany({ where: { demandeId: did } });
   await prisma.demande.delete({ where: { id: did } });
 
   res.json({ message: 'Demande supprimée définitivement' });

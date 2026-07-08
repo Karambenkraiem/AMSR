@@ -11,6 +11,10 @@ const ROLE_LABELS = {
   charge_exploitation: 'Chargé d\'Exploitation',
   chef_centrale: 'Chef de Centrale',
   chef_maintenance: 'Chef Maintenance',
+  directeur: 'Directeur',
+  animateur_securite: 'Animateur Sécurité',
+  responsable_securite: 'Responsable Sécurité',
+  guest: 'Invité',
 };
 
 const NavItem = ({ to, icon, label }) => (

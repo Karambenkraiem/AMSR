@@ -61,6 +61,9 @@ const WorkflowStep = ({ number, label, done, active, date, user: stepUser, pendi
   </div>
 );
 
+const SECURITE_READ_ROLES = ['admin', 'animateur_securite', 'responsable_securite'];
+const SECURITE_WRITE_ROLES = ['admin', 'animateur_securite'];
+
 export default function DetailDemande() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -72,6 +75,34 @@ export default function DetailDemande() {
   const [modal, setModal] = useState(null);
   const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({});
+  const [commentaires, setCommentaires] = useState([]);
+  const [nouveauCommentaire, setNouveauCommentaire] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
+
+  const canSeeSecurite = SECURITE_READ_ROLES.includes(user.role);
+  const canWriteSecurite = SECURITE_WRITE_ROLES.includes(user.role);
+
+  const fetchCommentaires = async () => {
+    if (!canSeeSecurite) return;
+    try {
+      const res = await api.get(`/commentaires-securite/demande/${id}`);
+      setCommentaires(res.data);
+    } catch { /* pas de droit ou erreur réseau */ }
+  };
+
+  const submitCommentaire = async () => {
+    if (!nouveauCommentaire.trim()) return;
+    setCommentLoading(true);
+    try {
+      await api.post('/commentaires-securite', { demandeId: parseInt(id), contenu: nouveauCommentaire.trim() });
+      setNouveauCommentaire('');
+      await fetchCommentaires();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Erreur lors de l\'ajout du commentaire');
+    } finally {
+      setCommentLoading(false);
+    }
+  };
 
   const demandePrintRef = useRef();
   const attestationPrintRef = useRef();
@@ -91,6 +122,7 @@ export default function DetailDemande() {
   useEffect(() => {
     api.get('/users').then((r) => setUsers(r.data)).catch(() => {});
   }, []);
+  useEffect(() => { fetchCommentaires(); }, [id]);
 
   const doAction = async (action, extraData = {}) => {
     setActionLoading(true);
@@ -336,6 +368,46 @@ export default function DetailDemande() {
                       <div className="font-medium text-orange-800 mb-1">Arrêt du {intr.dateArret ? format(new Date(intr.dateArret), 'dd/MM/yyyy') : '—'} à {intr.heureArret || '—'}</div>
                       <div className="text-orange-700">État: <span className="font-semibold capitalize">{intr.etatRegime}</span></div>
                       {intr.dateReprise && <div className="text-orange-700">Reprise: {format(new Date(intr.dateReprise), 'dd/MM/yyyy HH:mm')}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Commentaires sécurité — jamais imprimés, réservés aux rôles sécurité */}
+          {canSeeSecurite && (
+            <div className="card">
+              <SectionTitle>🛡️ Commentaires sécurité</SectionTitle>
+              <p className="text-xs text-gray-400 mb-3">Visibles uniquement par les rôles sécurité — n'apparaissent jamais sur les documents imprimés.</p>
+
+              {canWriteSecurite && (
+                <div className="flex gap-2 mb-4">
+                  <textarea
+                    className="input-field flex-1 text-sm"
+                    rows={2}
+                    placeholder="Ajouter un commentaire de sécurité..."
+                    value={nouveauCommentaire}
+                    onChange={(e) => setNouveauCommentaire(e.target.value)}
+                  />
+                  <button
+                    onClick={submitCommentaire}
+                    disabled={commentLoading || !nouveauCommentaire.trim()}
+                    className="btn-primary text-sm shrink-0 self-end"
+                  >
+                    Ajouter
+                  </button>
+                </div>
+              )}
+
+              {commentaires.length === 0 ? (
+                <div className="text-sm text-gray-300 italic">Aucun commentaire pour l'instant</div>
+              ) : (
+                <div className="space-y-3">
+                  {commentaires.map((c) => (
+                    <div key={c.id} className="bg-pink-50 border border-pink-100 rounded-lg p-3">
+                      <div className="text-sm text-gray-800 whitespace-pre-wrap">{c.contenu}</div>
+                      <div className="text-xs text-gray-400 mt-1">{c.auteur.prenom} {c.auteur.nom} — {format(new Date(c.createdAt), 'dd/MM/yyyy HH:mm')}</div>
                     </div>
                   ))}
                 </div>
