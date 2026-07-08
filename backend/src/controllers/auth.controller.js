@@ -36,6 +36,8 @@ const me = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
+  if (req.user.role === 'guest') return res.status(403).json({ error: 'Non autorisé pour ce rôle' });
+
   const { ancienMotDePasse, nouveauMotDePasse } = req.body;
   if (!ancienMotDePasse || !nouveauMotDePasse) return res.status(400).json({ error: 'Champs requis manquants' });
 
@@ -47,4 +49,21 @@ const changePassword = async (req, res) => {
   res.json({ message: 'Mot de passe modifié avec succès' });
 };
 
-module.exports = { login, me, changePassword };
+const updateProfile = async (req, res) => {
+  if (req.user.role === 'guest') return res.status(403).json({ error: 'Non autorisé pour ce rôle' });
+
+  const { nom, prenom, email } = req.body;
+  if (!nom || !prenom || !email) return res.status(400).json({ error: 'Champs requis manquants' });
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing && existing.id !== req.user.id) return res.status(400).json({ error: 'Email déjà utilisé' });
+
+  const updated = await prisma.user.update({
+    where: { id: req.user.id },
+    data: { nom, prenom, email },
+    select: { id: true, nom: true, prenom: true, email: true, matricule: true, role: true, centrale: true, active: true },
+  });
+  res.json(updated);
+};
+
+module.exports = { login, me, changePassword, updateProfile };

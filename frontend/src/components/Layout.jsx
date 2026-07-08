@@ -114,6 +114,9 @@ export default function Layout() {
                 <div className="text-sm font-medium text-gray-900 truncate">{user?.prenom} {user?.nom}</div>
                 <div className="text-xs text-gray-500 truncate">{ROLE_LABELS[user?.role]}</div>
               </div>
+              {user?.role !== 'guest' && (
+                <NavLink to="/mon-compte" className="text-gray-400 hover:text-steg-primary text-lg" title="Mon compte">⚙️</NavLink>
+              )}
               <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 text-lg" title="Déconnexion">⏻</button>
             </div>
           ) : (

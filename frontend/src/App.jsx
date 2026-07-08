@@ -13,6 +13,9 @@ import DetailAttestation from './pages/attestations/DetailAttestation';
 import RemplirAttestation from './pages/attestations/RemplirAttestation';
 import GestionUtilisateurs from './pages/admin/GestionUtilisateurs';
 import GestionDelegations from './pages/delegations/GestionDelegations';
+import MonCompte from './pages/MonCompte';
+
+const NON_GUEST_ROLES = ['admin', 'charge_travaux', 'charge_consignation', 'charge_exploitation', 'chef_centrale', 'chef_maintenance', 'directeur', 'animateur_securite', 'responsable_securite'];
 
 const PrivateRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
@@ -37,6 +40,7 @@ const AppRoutes = () => {
         <Route path="attestations/:id" element={<DetailAttestation />} />
         <Route path="admin/utilisateurs" element={<PrivateRoute roles={['admin']}><GestionUtilisateurs /></PrivateRoute>} />
         <Route path="delegations" element={<PrivateRoute roles={['charge_exploitation', 'chef_centrale', 'admin']}><GestionDelegations /></PrivateRoute>} />
+        <Route path="mon-compte" element={<PrivateRoute roles={NON_GUEST_ROLES}><MonCompte /></PrivateRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
