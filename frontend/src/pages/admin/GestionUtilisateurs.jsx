@@ -106,11 +106,13 @@ export default function GestionUtilisateurs() {
       </div>
 
       {/* Mode démonstration */}
-      <div className="card flex items-center justify-between">
+      <div className="card flex items-center justify-between border-l-4 border-amber-400">
         <div>
           <div className="font-semibold text-gray-800">🎯 Mode démonstration</div>
-          <p className="text-sm text-gray-500 mt-0.5">
-            Affiche ou masque les boutons d'accès démo rapide sur la page de connexion.
+          <p className="text-sm text-gray-500 mt-0.5 max-w-xl">
+            Affiche sur la page de connexion un bouton par compte réel actif — connexion en un clic,
+            <strong className="text-amber-700"> sans mot de passe</strong>, pour n'importe quel utilisateur.
+            À activer uniquement pendant une présentation, puis à désactiver juste après.
           </p>
         </div>
         <button

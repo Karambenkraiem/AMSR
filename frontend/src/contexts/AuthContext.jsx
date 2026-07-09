@@ -26,6 +26,13 @@ export const AuthProvider = ({ children }) => {
     return res.data.user;
   };
 
+  const quickLogin = async (userId) => {
+    const res = await api.post('/auth/quick-login', { userId });
+    localStorage.setItem('token', res.data.token);
+    setUser(res.data.user);
+    return res.data.user;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -34,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   const updateUser = (partial) => setUser((prev) => ({ ...prev, ...partial }));
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, quickLogin, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

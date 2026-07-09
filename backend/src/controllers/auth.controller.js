@@ -29,6 +29,27 @@ const login = async (req, res) => {
   res.json({ token, user: { ...userSafe, delegatedRoles } });
 };
 
+const quickLogin = async (req, res) => {
+  try {
+    const config = await prisma.appConfig.upsert({ where: { id: 1 }, update: {}, create: { id: 1 } });
+    if (!config.demoModeEnabled) return res.status(403).json({ error: 'Mode démo désactivé' });
+
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: 'userId requis' });
+
+    const user = await prisma.user.findUnique({ where: { id: parseInt(userId) } });
+    if (!user || !user.active) return res.status(401).json({ error: 'Compte introuvable ou inactif' });
+
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    const { password: _, ...userSafe } = user;
+    const delegatedRoles = await getActiveDelegatedRoles(user.id);
+    res.json({ token, user: { ...userSafe, delegatedRoles } });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Erreur lors de la connexion démo' });
+  }
+};
+
 const me = async (req, res) => {
   const { password: _, ...userSafe } = req.user;
   // delegatedRoles already injected by auth middleware
@@ -66,4 +87,4 @@ const updateProfile = async (req, res) => {
   res.json(updated);
 };
 
-module.exports = { login, me, changePassword, updateProfile };
+module.exports = { login, quickLogin, me, changePassword, updateProfile };

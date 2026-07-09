@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 
-const DEMO_ACCOUNTS = [
-  { matricule: 'DEMO-EXP',  password: 'Demo@2024', label: 'Chargé Exploitation',   color: 'bg-blue-600',    icon: '⚡' },
-  { matricule: 'DEMO-TRV',  password: 'Demo@2024', label: 'Chargé Travaux 1',      color: 'bg-orange-500',  icon: '🔧' },
-  { matricule: 'DEMO-TRV2', password: 'Demo@2024', label: 'Chargé Travaux 2',      color: 'bg-amber-600',   icon: '🔧' },
-  { matricule: 'DEMO-CSG',  password: 'Demo@2024', label: 'Chargé Consignation',   color: 'bg-green-600',   icon: '🔒' },
-  { matricule: 'DEMO-CHF',  password: 'Demo@2024', label: 'Chef de Centrale',      color: 'bg-purple-600',  icon: '👷' },
-  { matricule: 'DEMO-CHM',  password: 'Demo@2024', label: 'Chef Maintenance',      color: 'bg-teal-600',    icon: '🛠️' },
-  { matricule: 'DEMO-DIR',  password: 'Demo@2024', label: 'Directeur',             color: 'bg-indigo-600',  icon: '🧭' },
-  { matricule: 'DEMO-ANS',  password: 'Demo@2024', label: 'Animateur Sécurité',    color: 'bg-pink-600',    icon: '🦺' },
-  { matricule: 'DEMO-RES',  password: 'Demo@2024', label: 'Responsable Sécurité',  color: 'bg-fuchsia-700', icon: '🛡️' },
-  { matricule: 'DEMO-GST',  password: 'Demo@2024', label: 'Invité',                color: 'bg-slate-500',   icon: '👁️' },
-];
+const ROLE_META = {
+  admin:                 { label: 'Administrateur',       color: 'bg-red-600',     icon: '🛡️' },
+  charge_travaux:        { label: 'Chargé Travaux',       color: 'bg-orange-500',  icon: '🔧' },
+  charge_consignation:   { label: 'Chargé Consignation',  color: 'bg-green-600',   icon: '🔒' },
+  charge_exploitation:   { label: 'Chargé Exploitation',  color: 'bg-blue-600',    icon: '⚡' },
+  chef_centrale:         { label: 'Chef de Centrale',     color: 'bg-purple-600',  icon: '👷' },
+  chef_maintenance:      { label: 'Chef Maintenance',     color: 'bg-teal-600',    icon: '🛠️' },
+  directeur:             { label: 'Directeur',            color: 'bg-indigo-600',  icon: '🧭' },
+  animateur_securite:    { label: 'Animateur Sécurité',   color: 'bg-pink-600',    icon: '🦺' },
+  responsable_securite:  { label: 'Responsable Sécurité', color: 'bg-fuchsia-700', icon: '🛡️' },
+  guest:                 { label: 'Invité',               color: 'bg-slate-500',   icon: '👁️' },
+};
 
 const APK_URL = 'https://amsr.alkaramsoft.ovh/download/amsr-steg.apk';
 const APPSTORE_URL = 'https://apps.apple.com/app/amsr-steg/id000000000';
@@ -105,8 +105,9 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
   const [demoModeEnabled, setDemoModeEnabled] = useState(false);
+  const [quickUsers, setQuickUsers] = useState([]);
   const [demoLoading, setDemoLoading] = useState(null);
-  const { login } = useAuth();
+  const { login, quickLogin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -114,6 +115,13 @@ export default function Login() {
       .then((res) => setDemoModeEnabled(!!res.data.enabled))
       .catch(() => setDemoModeEnabled(false));
   }, []);
+
+  useEffect(() => {
+    if (!demoModeEnabled) { setQuickUsers([]); return; }
+    api.get('/config/quick-access-users')
+      .then((res) => setQuickUsers(res.data))
+      .catch(() => setQuickUsers([]));
+  }, [demoModeEnabled]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -129,14 +137,14 @@ export default function Login() {
     }
   };
 
-  const loginAsDemo = async (account) => {
-    setDemoLoading(account.matricule);
+  const loginAsUser = async (u) => {
+    setDemoLoading(u.id);
     setError('');
     try {
-      await login(account.matricule, account.password);
+      await quickLogin(u.id);
       navigate('/');
     } catch {
-      setError('Compte démo indisponible — le déploiement est peut-être en cours.');
+      setError('Connexion démo indisponible.');
     } finally {
       setDemoLoading(null);
     }
@@ -210,22 +218,29 @@ export default function Login() {
               </button>
 
               {demoOpen && (
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  {DEMO_ACCOUNTS.map(account => (
-                    <button
-                      key={account.matricule}
-                      type="button"
-                      onClick={() => loginAsDemo(account)}
-                      disabled={demoLoading !== null}
-                      className={`${account.color} hover:opacity-90 text-white rounded-xl px-2 py-3 text-left transition-opacity disabled:opacity-60`}
-                    >
-                      <div className="text-lg mb-0.5">{account.icon}</div>
-                      <div className="text-[11px] font-bold leading-tight">{account.label}</div>
-                      {demoLoading === account.matricule && (
-                        <div className="text-[10px] opacity-80 mt-0.5">Connexion...</div>
-                      )}
-                    </button>
-                  ))}
+                <div className="mt-3 max-h-72 overflow-y-auto grid grid-cols-3 gap-2 pr-1">
+                  {quickUsers.length === 0 && (
+                    <div className="col-span-3 text-xs text-gray-400 text-center py-4">Aucun compte disponible</div>
+                  )}
+                  {quickUsers.map(u => {
+                    const meta = ROLE_META[u.role] || { label: u.role, color: 'bg-gray-500', icon: '👤' };
+                    return (
+                      <button
+                        key={u.id}
+                        type="button"
+                        onClick={() => loginAsUser(u)}
+                        disabled={demoLoading !== null}
+                        className={`${meta.color} hover:opacity-90 text-white rounded-xl px-2 py-3 text-left transition-opacity disabled:opacity-60`}
+                      >
+                        <div className="text-lg mb-0.5">{meta.icon}</div>
+                        <div className="text-[11px] font-bold leading-tight truncate">{u.prenom} {u.nom}</div>
+                        <div className="text-[9px] opacity-80 leading-tight">{meta.label}</div>
+                        {demoLoading === u.id && (
+                          <div className="text-[10px] opacity-80 mt-0.5">Connexion...</div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
