@@ -17,6 +17,13 @@ const ROLE_LABELS = {
   guest: 'Invité',
 };
 
+const IconPower = ({ cls = 'w-5 h-5' }) => (
+  <svg viewBox="0 0 24 24" className={cls} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2v10" />
+    <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+  </svg>
+);
+
 const NavItem = ({ to, icon, label }) => (
   <NavLink
     to={to}
@@ -117,10 +124,10 @@ export default function Layout() {
               {user?.role !== 'guest' && (
                 <NavLink to="/mon-compte" className="text-gray-400 hover:text-steg-primary text-lg" title="Mon compte">⚙️</NavLink>
               )}
-              <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 text-lg" title="Déconnexion">⏻</button>
+              <button onClick={handleLogout} className="text-gray-400 hover:text-red-500" title="Déconnexion"><IconPower /></button>
             </div>
           ) : (
-            <button onClick={handleLogout} className="w-full flex justify-center p-2 text-gray-400 hover:text-red-500" title="Déconnexion">⏻</button>
+            <button onClick={handleLogout} className="w-full flex justify-center p-2 text-gray-400 hover:text-red-500" title="Déconnexion"><IconPower /></button>
           )}
         </div>
       </aside>

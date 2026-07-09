@@ -20,6 +20,26 @@ function isDismissed() {
   return v && Date.now() < Number(v);
 }
 
+/* ── capture de beforeinstallprompt au niveau module ────────────
+   Le navigateur ne déclenche cet événement qu'UNE FOIS par chargement
+   de page. On le capte donc globalement dès que le module se charge,
+   pour que la popup automatique ET le bouton "Installer" manuel de la
+   sidebar (deux instances distinctes du composant) y aient accès. */
+let capturedPrompt = null;
+const promptListeners = new Set();
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  capturedPrompt = e;
+  promptListeners.forEach((fn) => fn(e));
+});
+
+function subscribeToInstallPrompt(setter) {
+  if (capturedPrompt) setter(capturedPrompt);
+  promptListeners.add(setter);
+  return () => promptListeners.delete(setter);
+}
+
 /* ── icônes ──────────────────────────────────────────────────── */
 const IconAndroid = ({ cls = 'w-6 h-6' }) => (
   <svg viewBox="0 0 24 24" className={cls} fill="currentColor">
@@ -77,25 +97,21 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
     if (window.Capacitor?.isNativePlatform?.()) return;
     if (isStandalone()) return; // déjà installée, pas de suggestion
 
-    if (forceShow) { setOs(detectOS()); setShow(true); return; }
-    if (isDismissed()) return;
+    setOs(detectOS());
 
-    const detectedOs = detectOS();
-    setOs(detectedOs);
+    // Abonnement à l'événement natif d'installation (Chrome/Edge), déjà
+    // capté au niveau module s'il s'est déclenché avant ce montage.
+    const onPrompt = (e) => { setNativePrompt(e); setShow(true); };
+    const unsubscribe = subscribeToInstallPrompt(onPrompt);
 
-    // Android Chrome : écouter l'événement natif d'installation PWA
-    const handler = (e) => {
-      e.preventDefault();
-      setNativePrompt(e);
-      setShow(true);
-    };
-    window.addEventListener('beforeinstallprompt', handler);
+    if (forceShow) { setShow(true); return unsubscribe; }
+    if (isDismissed()) return unsubscribe;
 
-    // iOS / desktop : délai avant affichage
+    // iOS / desktop sans événement natif : délai avant affichage
     const t = setTimeout(() => setShow(true), 1200);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+      unsubscribe();
       clearTimeout(t);
     };
   }, [forceShow]);
@@ -112,6 +128,7 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
     if (!nativePrompt) return;
     nativePrompt.prompt();
     await nativePrompt.userChoice;
+    capturedPrompt = null; // l'événement ne peut être utilisé qu'une fois
     setNativePrompt(null);
     dismiss();
   };
