@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '../../services/api';
 import ConfirmDialog from '../../components/ConfirmDialog';
 
@@ -26,6 +26,21 @@ const ROLE_COLORS = {
 
 const emptyForm = { nom: '', prenom: '', email: '', role: 'charge_travaux', matricule: '', centrale: 'Centrale Goulette 2', password: '', active: true };
 
+const SORT_GETTERS = {
+  utilisateur: (u) => `${u.prenom || ''} ${u.nom || ''}`.trim().toLowerCase(),
+  matricule: (u) => (u.matricule || '').toLowerCase(),
+  role: (u) => (ROLE_LABELS[u.role] || u.role || '').toLowerCase(),
+  centrale: (u) => (u.centrale || '').toLowerCase(),
+  email: (u) => (u.email || '').toLowerCase(),
+  statut: (u) => (u.active ? 0 : 1),
+};
+
+const SortIcon = ({ active, direction }) => (
+  <span className={`ml-1 inline-block transition-opacity ${active ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}>
+    {active && direction === 'desc' ? '▾' : '▴'}
+  </span>
+);
+
 export default function GestionUtilisateurs() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +52,22 @@ export default function GestionUtilisateurs() {
   const [confirmDelete, setConfirmDelete] = useState(null); // { id, nom }
   const [demoModeEnabled, setDemoModeEnabled] = useState(null);
   const [demoModeSaving, setDemoModeSaving] = useState(false);
+  const [sort, setSort] = useState({ key: 'utilisateur', direction: 'asc' });
+
+  const toggleSort = (key) => {
+    setSort((p) => (p.key === key ? { key, direction: p.direction === 'asc' ? 'desc' : 'asc' } : { key, direction: 'asc' }));
+  };
+
+  const sortedUsers = useMemo(() => {
+    const getter = SORT_GETTERS[sort.key];
+    const dir = sort.direction === 'asc' ? 1 : -1;
+    return [...users].sort((a, b) => {
+      const va = getter(a), vb = getter(b);
+      if (va < vb) return -1 * dir;
+      if (va > vb) return 1 * dir;
+      return 0;
+    });
+  }, [users, sort]);
 
   const fetchUsers = () => {
     setLoading(true);
@@ -135,17 +166,30 @@ export default function GestionUtilisateurs() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-gray-500 border-b border-gray-200">
-                  <th className="pb-3 pr-4 font-medium">Utilisateur</th>
-                  <th className="pb-3 pr-4 font-medium">Matricule</th>
-                  <th className="pb-3 pr-4 font-medium">Rôle</th>
-                  <th className="pb-3 pr-4 font-medium">Centrale</th>
-                  <th className="pb-3 pr-4 font-medium">Email</th>
-                  <th className="pb-3 pr-4 font-medium">Statut</th>
+                  {[
+                    ['utilisateur', 'Utilisateur'],
+                    ['matricule', 'Matricule'],
+                    ['role', 'Rôle'],
+                    ['centrale', 'Centrale'],
+                    ['email', 'Email'],
+                    ['statut', 'Statut'],
+                  ].map(([key, label]) => (
+                    <th key={key} className="pb-3 pr-4 font-medium">
+                      <button
+                        type="button"
+                        onClick={() => toggleSort(key)}
+                        className="group flex items-center hover:text-gray-800 transition-colors"
+                      >
+                        {label}
+                        <SortIcon active={sort.key === key} direction={sort.direction} />
+                      </button>
+                    </th>
+                  ))}
                   <th className="pb-3 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {users.map((u) => (
+                {sortedUsers.map((u) => (
                   <tr key={u.id} className={`hover:bg-gray-50 transition-colors ${!u.active ? 'opacity-50' : ''}`}>
                     <td className="py-3 pr-4">
                       <div className="flex items-center gap-3">
