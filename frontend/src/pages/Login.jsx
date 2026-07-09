@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api';
 
 const DEMO_ACCOUNTS = [
   { matricule: 'DEMO-EXP',  password: 'Demo@2024', label: 'Chargé Exploitation',   color: 'bg-blue-600',    icon: '⚡' },
@@ -103,9 +104,16 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
+  const [demoModeEnabled, setDemoModeEnabled] = useState(false);
   const [demoLoading, setDemoLoading] = useState(null);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    api.get('/config/demo-mode')
+      .then((res) => setDemoModeEnabled(!!res.data.enabled))
+      .catch(() => setDemoModeEnabled(false));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,39 +195,41 @@ export default function Login() {
           </form>
 
           {/* Section démo */}
-          <div className="mt-5 pt-5 border-t border-gray-100">
-            <button
-              type="button"
-              onClick={() => setDemoOpen(o => !o)}
-              className="w-full flex items-center justify-between text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <span className="flex items-center gap-2">
-                <span className="text-base">🎯</span>
-                Accès démo — cliquez pour tester
-              </span>
-              <span className={`transition-transform duration-200 ${demoOpen ? 'rotate-180' : ''}`}>▾</span>
-            </button>
+          {demoModeEnabled && (
+            <div className="mt-5 pt-5 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setDemoOpen(o => !o)}
+                className="w-full flex items-center justify-between text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-base">🎯</span>
+                  Accès démo — cliquez pour tester
+                </span>
+                <span className={`transition-transform duration-200 ${demoOpen ? 'rotate-180' : ''}`}>▾</span>
+              </button>
 
-            {demoOpen && (
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                {DEMO_ACCOUNTS.map(account => (
-                  <button
-                    key={account.matricule}
-                    type="button"
-                    onClick={() => loginAsDemo(account)}
-                    disabled={demoLoading !== null}
-                    className={`${account.color} hover:opacity-90 text-white rounded-xl px-2 py-3 text-left transition-opacity disabled:opacity-60`}
-                  >
-                    <div className="text-lg mb-0.5">{account.icon}</div>
-                    <div className="text-[11px] font-bold leading-tight">{account.label}</div>
-                    {demoLoading === account.matricule && (
-                      <div className="text-[10px] opacity-80 mt-0.5">Connexion...</div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+              {demoOpen && (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {DEMO_ACCOUNTS.map(account => (
+                    <button
+                      key={account.matricule}
+                      type="button"
+                      onClick={() => loginAsDemo(account)}
+                      disabled={demoLoading !== null}
+                      className={`${account.color} hover:opacity-90 text-white rounded-xl px-2 py-3 text-left transition-opacity disabled:opacity-60`}
+                    >
+                      <div className="text-lg mb-0.5">{account.icon}</div>
+                      <div className="text-[11px] font-bold leading-tight">{account.label}</div>
+                      {demoLoading === account.matricule && (
+                        <div className="text-[10px] opacity-80 mt-0.5">Connexion...</div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <AppDownloadSection />
         </div>

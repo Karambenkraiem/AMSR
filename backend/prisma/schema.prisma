@@ -246,3 +246,10 @@ model CommentaireSecurite {
   contenu       String
   createdAt     DateTime     @default(now())
 }
+
+// Ligne unique (id=1) — paramètres globaux de l'application
+model AppConfig {
+  id              Int     @id @default(1)
+  demoModeEnabled Boolean @default(true)
+  updatedAt       DateTime @updatedAt
+}

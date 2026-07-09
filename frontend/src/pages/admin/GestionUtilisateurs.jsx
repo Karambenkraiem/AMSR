@@ -35,6 +35,8 @@ export default function GestionUtilisateurs() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null); // { id, nom }
+  const [demoModeEnabled, setDemoModeEnabled] = useState(null);
+  const [demoModeSaving, setDemoModeSaving] = useState(false);
 
   const fetchUsers = () => {
     setLoading(true);
@@ -42,6 +44,21 @@ export default function GestionUtilisateurs() {
   };
 
   useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => {
+    api.get('/config/demo-mode').then((r) => setDemoModeEnabled(r.data.enabled)).catch(() => {});
+  }, []);
+
+  const toggleDemoMode = async () => {
+    setDemoModeSaving(true);
+    try {
+      const res = await api.put('/config/demo-mode', { enabled: !demoModeEnabled });
+      setDemoModeEnabled(res.data.enabled);
+    } catch {
+      alert('Erreur lors de la mise à jour du mode démo');
+    } finally {
+      setDemoModeSaving(false);
+    }
+  };
 
   const openCreate = () => { setForm(emptyForm); setEditId(null); setError(''); setModal('form'); };
   const openEdit = (u) => {
@@ -86,6 +103,26 @@ export default function GestionUtilisateurs() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Gestion des utilisateurs</h1>
         <button onClick={openCreate} className="btn-primary">+ Nouvel utilisateur</button>
+      </div>
+
+      {/* Mode démonstration */}
+      <div className="card flex items-center justify-between">
+        <div>
+          <div className="font-semibold text-gray-800">🎯 Mode démonstration</div>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Affiche ou masque les boutons d'accès démo rapide sur la page de connexion.
+          </p>
+        </div>
+        <button
+          onClick={toggleDemoMode}
+          disabled={demoModeEnabled === null || demoModeSaving}
+          className={`relative w-14 h-8 rounded-full transition-colors shrink-0 ${demoModeEnabled ? 'bg-green-500' : 'bg-gray-300'} disabled:opacity-50`}
+          title={demoModeEnabled ? 'Désactiver le mode démo' : 'Activer le mode démo'}
+        >
+          <span
+            className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${demoModeEnabled ? 'translate-x-6' : 'translate-x-0'}`}
+          />
+        </button>
       </div>
 
       <div className="card">
