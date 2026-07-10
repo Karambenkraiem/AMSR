@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { APK_URL } from '../utils/mobileDetect';
 
 const DISMISS_KEY   = 'amsr_install_dismissed_until';
 const DISMISS_DAYS  = 14;
-const APK_URL       = 'https://amsr.alkaramsoft.ovh/download/amsr-steg.apk';
 
 /* ── helpers ─────────────────────────────────────────────────── */
 function isStandalone() {

@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AppInstallPrompt from './components/AppInstallPrompt';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import AppDownload from './pages/AppDownload';
 import Dashboard from './pages/Dashboard';
 import ListeDemandes from './pages/demandes/ListeDemandes';
 import NouvelleDemande from './pages/demandes/NouvelleDemande';
@@ -30,6 +31,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+      <Route path="/app" element={<AppDownload />} />
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="demandes" element={<ListeDemandes />} />

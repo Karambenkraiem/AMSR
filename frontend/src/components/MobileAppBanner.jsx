@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { getMobileOS, APK_URL, APPSTORE_URL, IOS_AVAILABLE } from '../utils/mobileDetect';
 
 const STORAGE_KEY = 'amsr_app_banner_dismissed';
 
 const LINKS = {
-  android: 'https://amsr.alkaramsoft.ovh/download/amsr-steg.apk',
-  ios: 'https://apps.apple.com/app/amsr-steg/id000000000',
+  android: APK_URL,
+  ios: APPSTORE_URL,
 };
-
-function getMobileOS() {
-  const ua = navigator.userAgent;
-  if (/android/i.test(ua)) return 'android';
-  if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'ios';
-  return null;
-}
 
 export default function MobileAppBanner() {
   const [visible, setVisible] = useState(false);
@@ -26,6 +20,7 @@ export default function MobileAppBanner() {
     if (dismissed) return;
 
     const detectedOs = getMobileOS();
+    if (detectedOs === 'ios' && !IOS_AVAILABLE) return; // app iOS pas encore publiée
     if (detectedOs) {
       setOs(detectedOs);
       setVisible(true);
