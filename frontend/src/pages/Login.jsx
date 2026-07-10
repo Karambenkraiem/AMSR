@@ -18,31 +18,77 @@ const ROLE_META = {
   guest:                 { label: 'Invité',               color: 'bg-slate-500',   icon: '👁️' },
 };
 
-function AppDownloadSection() {
-  // Ne pas afficher si l'utilisateur est déjà dans l'app native Capacitor
-  if (isNativeApp()) return null;
+const QR_MODAL_DISMISS_KEY = 'amsr_qr_modal_dismissed';
 
+function QrDownloadModal({ onClose }) {
+  const downloadUrl = `${window.location.origin}/app`;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 text-center relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-300 hover:text-gray-500 text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+          aria-label="Fermer"
+        >
+          ×
+        </button>
+        <p className="text-sm font-bold text-gray-800 mb-1">Application mobile STEG</p>
+        <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">Scannez pour installer</p>
+        <div className="inline-block p-2 bg-white border border-gray-200 rounded-xl">
+          <QRCodeSVG value={downloadUrl} size={160} />
+        </div>
+        <p className="text-xs text-gray-500 mt-4 leading-relaxed">
+          Ouvrez l'appareil photo de votre téléphone
+          <br />
+          et scannez ce code (Android / iOS)
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AppDownloadSection() {
   const os = getMobileOS();
+  const isDesktop = os === null;
+  const native = isNativeApp();
+  const [showQrModal, setShowQrModal] = useState(false);
+
+  // Sur desktop, propose automatiquement le QR code au chargement de la page
+  // (une seule fois par session pour ne pas être intrusif).
+  useEffect(() => {
+    if (native || !isDesktop) return;
+    if (sessionStorage.getItem(QR_MODAL_DISMISS_KEY)) return;
+    setShowQrModal(true);
+  }, [native, isDesktop]);
+
+  const closeQrModal = () => {
+    sessionStorage.setItem(QR_MODAL_DISMISS_KEY, '1');
+    setShowQrModal(false);
+  };
+
+  // Ne pas afficher si l'utilisateur est déjà dans l'app native Capacitor
+  if (native) return null;
 
   // Sur desktop (Chrome/Edge...), un lien de téléchargement direct ne sert à
-  // rien : on affiche un QR code à scanner avec un téléphone à la place.
-  if (os === null) {
-    const downloadUrl = `${window.location.origin}/app`;
+  // rien : on propose une popup avec un QR code à scanner avec un téléphone.
+  if (isDesktop) {
     return (
       <div className="mt-6 pt-5 border-t border-gray-100">
-        <p className="text-xs text-gray-400 font-medium text-center mb-3 uppercase tracking-wide">
-          Application mobile STEG
-        </p>
-        <div className="flex flex-col items-center gap-2">
-          <div className="p-2 bg-white border border-gray-200 rounded-xl">
-            <QRCodeSVG value={downloadUrl} size={128} />
-          </div>
-          <p className="text-xs text-gray-500 text-center leading-relaxed">
-            Scannez ce code avec votre téléphone
-            <br />
-            pour télécharger l'application (Android / iOS)
-          </p>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowQrModal(true)}
+          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+        >
+          <span>📱</span>
+          Télécharger l'application mobile
+        </button>
+        {showQrModal && <QrDownloadModal onClose={closeQrModal} />}
       </div>
     );
   }
