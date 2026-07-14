@@ -159,7 +159,7 @@ export default function DetailDemande() {
     || user.role === 'chef_centrale'
     || user.role === 'chef_maintenance'
     || user.role === 'charge_consignation';
-  const isAssistantCT = user.id === demande.assistantChargeTravauxId && user.id !== demande.chargeTravauxId;
+  const isAssistantCT = user.id === att?.assistantDelivreId && user.id !== demande.chargeTravauxId;
 
   // Seul le CT affecté à cette demande (ou chef_centrale/admin pour cas exceptionnels)
   const canTerminer =
