@@ -12,10 +12,10 @@ const ROLE_LABELS = {
 
 const STATUS_BADGE = (d) => {
   const now = new Date();
-  if (!d.active) return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-500">Révoquée</span>;
-  if (new Date(d.dateFin) < now) return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-500">Expirée</span>;
-  if (new Date(d.dateDebut) > now) return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700">Planifiée</span>;
-  return <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700 font-semibold">Active</span>;
+  if (!d.active) return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">Révoquée</span>;
+  if (new Date(d.dateFin) < now) return <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">Expirée</span>;
+  if (new Date(d.dateDebut) > now) return <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Planifiée</span>;
+  return <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 font-semibold">Active</span>;
 };
 
 const emptyForm = {
@@ -78,8 +78,8 @@ export default function GestionDelegations() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Délégations de rôle</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Délégations de rôle</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Désignez temporairement des agents pour agir en votre nom avec votre rôle.
           </p>
         </div>
@@ -90,11 +90,11 @@ export default function GestionDelegations() {
 
       {/* Indicateur délégation active sur l'utilisateur courant */}
       {user.delegatedRoles?.length > 0 && (
-        <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 flex items-start gap-3">
+        <div className="bg-amber-50 border border-amber-300 dark:bg-amber-900/20 dark:border-amber-700 rounded-xl px-4 py-3 flex items-start gap-3">
           <span className="text-xl">🔑</span>
           <div>
-            <div className="font-semibold text-amber-800 text-sm">Délégation active sur votre compte</div>
-            <div className="text-sm text-amber-700">
+            <div className="font-semibold text-amber-800 dark:text-amber-300 text-sm">Délégation active sur votre compte</div>
+            <div className="text-sm text-amber-700 dark:text-amber-400">
               Vous agissez actuellement avec le(s) rôle(s) délégué(s) :
               <strong> {user.delegatedRoles.map((r) => ROLE_LABELS[r] || r).join(', ')}</strong>
             </div>
@@ -105,8 +105,8 @@ export default function GestionDelegations() {
       {/* Formulaire */}
       {showForm && (
         <div className="card">
-          <h3 className="text-lg font-bold mb-4">Nouvelle délégation</h3>
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded text-sm mb-4">{error}</div>}
+          <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Nouvelle délégation</h3>
+          {error && <div className="bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-2 rounded text-sm mb-4">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -152,14 +152,14 @@ export default function GestionDelegations() {
       {/* Liste */}
       <div className="card">
         {loading ? (
-          <div className="text-center py-10 text-gray-400">Chargement...</div>
+          <div className="text-center py-10 text-gray-400 dark:text-gray-500">Chargement...</div>
         ) : delegations.length === 0 ? (
-          <div className="text-center py-10 text-gray-400">Aucune délégation créée</div>
+          <div className="text-center py-10 text-gray-400 dark:text-gray-500">Aucune délégation créée</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-500 border-b border-gray-200">
+                <tr className="text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
                   <th className="pb-3 pr-4 font-medium">Délégant</th>
                   <th className="pb-3 pr-4 font-medium">Délégué</th>
                   <th className="pb-3 pr-4 font-medium">Rôle</th>
@@ -170,34 +170,34 @@ export default function GestionDelegations() {
                   <th className="pb-3 font-medium">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                 {delegations.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={d.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <td className="py-3 pr-4">
-                      <div className="font-medium text-gray-900">{d.delegant?.prenom} {d.delegant?.nom}</div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{d.delegant?.prenom} {d.delegant?.nom}</div>
                     </td>
                     <td className="py-3 pr-4">
-                      <div className="font-medium text-gray-900">{d.delegue?.prenom} {d.delegue?.nom}</div>
-                      <div className="text-xs text-gray-400">{d.delegue?.role?.replace(/_/g, ' ')}</div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{d.delegue?.prenom} {d.delegue?.nom}</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500">{d.delegue?.role?.replace(/_/g, ' ')}</div>
                     </td>
                     <td className="py-3 pr-4">
-                      <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 font-medium">
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 font-medium">
                         {ROLE_LABELS[d.role] || d.role}
                       </span>
                     </td>
-                    <td className="py-3 pr-4 text-gray-600 text-xs whitespace-nowrap">
+                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-400 text-xs whitespace-nowrap">
                       {format(new Date(d.dateDebut), 'dd/MM/yyyy HH:mm')}
                     </td>
-                    <td className="py-3 pr-4 text-gray-600 text-xs whitespace-nowrap">
+                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-400 text-xs whitespace-nowrap">
                       {format(new Date(d.dateFin), 'dd/MM/yyyy HH:mm')}
                     </td>
-                    <td className="py-3 pr-4 text-gray-500 text-xs">{d.note || '—'}</td>
+                    <td className="py-3 pr-4 text-gray-500 dark:text-gray-400 text-xs">{d.note || '—'}</td>
                     <td className="py-3 pr-4">{STATUS_BADGE(d)}</td>
                     <td className="py-3">
                       {(isActive(d) || (d.active && new Date(d.dateDebut) > now)) && (
                         d.delegantId === user.id || user.role === 'admin'
                       ) && (
-                        <button onClick={() => handleRevoke(d.id)} className="text-xs text-red-500 hover:underline">
+                        <button onClick={() => handleRevoke(d.id)} className="text-xs text-red-500 dark:text-red-400 hover:underline">
                           Révoquer
                         </button>
                       )}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import AppInstallPrompt from './components/AppInstallPrompt';
 import Layout from './components/Layout';
 import Login from './pages/Login';
@@ -52,10 +53,12 @@ const AppRoutes = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-        <AppInstallPrompt />
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AppRoutes />
+          <AppInstallPrompt />
+        </BrowserRouter>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

@@ -23,37 +23,37 @@ const REGIME_LABELS = {
 };
 
 const SectionTitle = ({ children }) => (
-  <h3 className="font-semibold text-gray-700 text-sm uppercase tracking-wide border-b border-gray-100 pb-2 mb-3">{children}</h3>
+  <h3 className="font-semibold text-gray-700 dark:text-gray-300 text-sm uppercase tracking-wide border-b border-gray-100 dark:border-gray-700 pb-2 mb-3">{children}</h3>
 );
 
 const Field = ({ label, value }) => (
   <div>
-    <div className="text-xs text-gray-400 font-medium mb-0.5">{label}</div>
-    <div className="text-sm text-gray-800">{value || <span className="text-gray-300 italic">—</span>}</div>
+    <div className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-0.5">{label}</div>
+    <div className="text-sm text-gray-800 dark:text-gray-200">{value || <span className="text-gray-300 dark:text-gray-600 italic">—</span>}</div>
   </div>
 );
 
 const Checkbox = ({ checked, label }) => (
   <div className="flex items-center gap-2">
-    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${checked ? 'bg-steg-primary border-steg-primary' : 'border-gray-300'}`}>
+    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${checked ? 'bg-steg-primary border-steg-primary' : 'border-gray-300 dark:border-gray-600'}`}>
       {checked && <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>}
     </div>
-    <span className="text-sm text-gray-700">{label}</span>
+    <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>
   </div>
 );
 
 const WorkflowStep = ({ number, label, done, active, date, user: stepUser, pendingRole }) => (
   <div className={`flex items-start gap-3 ${active ? 'opacity-100' : done ? 'opacity-100' : 'opacity-40'}`}>
-    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5 ${done ? 'bg-green-500 text-white' : active ? 'bg-steg-primary text-white animate-pulse' : 'bg-gray-200 text-gray-500'}`}>
+    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5 ${done ? 'bg-green-500 text-white' : active ? 'bg-steg-primary text-white animate-pulse' : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}`}>
       {done ? '✓' : number}
     </div>
     <div className="flex-1 min-w-0">
-      <div className={`text-sm font-medium ${done ? 'text-green-700' : active ? 'text-steg-primary' : 'text-gray-500'}`}>{label}</div>
+      <div className={`text-sm font-medium ${done ? 'text-green-700 dark:text-green-400' : active ? 'text-steg-primary dark:text-blue-300' : 'text-gray-500 dark:text-gray-400'}`}>{label}</div>
       {done && stepUser && (
-        <div className="text-xs text-gray-400 mt-0.5">{stepUser.prenom} {stepUser.nom} — {date && format(new Date(date), 'dd/MM/yyyy HH:mm')}</div>
+        <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{stepUser.prenom} {stepUser.nom} — {date && format(new Date(date), 'dd/MM/yyyy HH:mm')}</div>
       )}
       {!done && active && pendingRole && (
-        <div className="text-xs text-amber-600 font-medium mt-0.5 flex items-center gap-1">
+        <div className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-0.5 flex items-center gap-1">
           <span>⏳</span> En attente : <span className="font-semibold">{pendingRole}</span>
         </div>
       )}
@@ -194,11 +194,11 @@ export default function DetailDemande() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <Link to="/demandes" className="text-gray-400 hover:text-gray-600 text-sm">← Demandes</Link>
-            <span className="text-gray-300">/</span>
-            <span className="font-mono font-bold text-steg-primary text-lg">{demande.numero}</span>
+            <Link to="/demandes" className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-sm">← Demandes</Link>
+            <span className="text-gray-300 dark:text-gray-600">/</span>
+            <span className="font-mono font-bold text-steg-primary dark:text-blue-300 text-lg">{demande.numero}</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">{demande.designationOperation}</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{demande.designationOperation}</h1>
           <span className={`badge-${demande.status} mt-2`}>{STATUT_LABELS[demande.status]}</span>
         </div>
         <div className="flex gap-2">
@@ -231,7 +231,7 @@ export default function DetailDemande() {
               <div className="mb-4"><Field label="Instructions particulières" value={demande.instructionsParticulieres} /></div>
             )}
             <div>
-              <div className="text-xs text-gray-400 font-medium mb-2">Documents associés</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-2">Documents associés</div>
               <div className="grid grid-cols-2 gap-2">
                 <Checkbox checked={demande.permisFeu} label="Permis de feu" />
                 <Checkbox checked={demande.permisControle} label="Permis de contrôle" />
@@ -240,7 +240,7 @@ export default function DetailDemande() {
                 <Checkbox checked={demande.permisFouille} label="Permis de fouille" />
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
               <Field label="Chargé de Travaux" value={`${demande.chargeTravaux?.prenom} ${demande.chargeTravaux?.nom} (${demande.chargeTravaux?.matricule || '—'})`} />
               <div className="mt-2 flex items-start justify-between gap-2">
                 <div className="flex-1">
@@ -251,8 +251,8 @@ export default function DetailDemande() {
                     />
                   ) : (
                     <div>
-                      <div className="text-xs text-gray-400 font-medium mb-0.5">Assistant Chargé de Travaux</div>
-                      <div className="text-sm text-gray-300 italic">Aucun assistant désigné</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-0.5">Assistant Chargé de Travaux</div>
+                      <div className="text-sm text-gray-300 dark:text-gray-600 italic">Aucun assistant désigné</div>
                     </div>
                   )}
                 </div>
@@ -262,7 +262,7 @@ export default function DetailDemande() {
                       setFormData({ assistantId: demande.assistantChargeTravauxId?.toString() || '' });
                       setModal('assistant');
                     }}
-                    className="text-xs text-steg-primary hover:underline shrink-0 mt-4"
+                    className="text-xs text-steg-primary dark:text-blue-300 hover:underline shrink-0 mt-4"
                   >
                     {demande.assistantChargeTravaux ? '✏️ Modifier' : '+ Ajouter'}
                   </button>
@@ -295,12 +295,12 @@ export default function DetailDemande() {
 
               {att.instructions && att.instructions.length > 0 && (
                 <div className="mb-4">
-                  <div className="text-xs text-gray-400 font-medium mb-2">Instructions</div>
-                  <table className="w-full text-xs border border-gray-200 rounded">
-                    <thead className="bg-gray-50"><tr><th className="p-2 text-left border-b border-gray-200">Repère</th><th className="p-2 text-left border-b border-gray-200">Instruction</th><th className="p-2 border-b border-gray-200">Local</th><th className="p-2 border-b border-gray-200">État</th></tr></thead>
+                  <div className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-2">Instructions</div>
+                  <table className="w-full text-xs border border-gray-200 dark:border-gray-700 rounded">
+                    <thead className="bg-gray-50 dark:bg-gray-900"><tr><th className="p-2 text-left border-b border-gray-200 dark:border-gray-700">Repère</th><th className="p-2 text-left border-b border-gray-200 dark:border-gray-700">Instruction</th><th className="p-2 border-b border-gray-200 dark:border-gray-700">Local</th><th className="p-2 border-b border-gray-200 dark:border-gray-700">État</th></tr></thead>
                     <tbody>
                       {att.instructions.map((ins, i) => (
-                        <tr key={i} className="border-b border-gray-100">
+                        <tr key={i} className="border-b border-gray-100 dark:border-gray-700">
                           <td className="p-2">{ins.repere}</td>
                           <td className="p-2">{ins.instruction}</td>
                           <td className="p-2 text-center">{ins.local}</td>
@@ -313,45 +313,45 @@ export default function DetailDemande() {
               )}
 
               {/* Signature block */}
-              <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
-                <div className={`p-3 rounded-lg border ${att.accordDate ? 'border-green-200 bg-green-50' : 'border-dashed border-gray-200'}`}>
-                  <div className="text-xs font-semibold text-gray-500 mb-1">ACCORD — Chargé d'Exploitation</div>
-                  {att.accordDate ? <><div className="text-sm font-medium text-green-700">{att.accordExploitation?.prenom} {att.accordExploitation?.nom}</div><div className="text-xs text-gray-400">{format(new Date(att.accordDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 italic">En attente</div>}
+              <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                <div className={`p-3 rounded-lg border ${att.accordDate ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-dashed border-gray-200 dark:border-gray-700'}`}>
+                  <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">ACCORD — Chargé d'Exploitation</div>
+                  {att.accordDate ? <><div className="text-sm font-medium text-green-700 dark:text-green-400">{att.accordExploitation?.prenom} {att.accordExploitation?.nom}</div><div className="text-xs text-gray-400 dark:text-gray-500">{format(new Date(att.accordDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 dark:text-gray-500 italic">En attente</div>}
                 </div>
-                <div className={`p-3 rounded-lg border ${att.regimeExecuteDate ? 'border-green-200 bg-green-50' : 'border-dashed border-gray-200'}`}>
-                  <div className="text-xs font-semibold text-gray-500 mb-1">RÉGIME EXÉCUTÉ — Chargé Consignation</div>
-                  {att.regimeExecuteDate ? <><div className="text-sm font-medium text-green-700">{att.regimeExecute?.prenom} {att.regimeExecute?.nom}</div><div className="text-xs text-gray-400">{format(new Date(att.regimeExecuteDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 italic">En attente</div>}
+                <div className={`p-3 rounded-lg border ${att.regimeExecuteDate ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-dashed border-gray-200 dark:border-gray-700'}`}>
+                  <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">RÉGIME EXÉCUTÉ — Chargé Consignation</div>
+                  {att.regimeExecuteDate ? <><div className="text-sm font-medium text-green-700 dark:text-green-400">{att.regimeExecute?.prenom} {att.regimeExecute?.nom}</div><div className="text-xs text-gray-400 dark:text-gray-500">{format(new Date(att.regimeExecuteDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 dark:text-gray-500 italic">En attente</div>}
                 </div>
-                <div className={`p-3 rounded-lg border ${att.regimeDelivreDate ? 'border-green-200 bg-green-50' : 'border-dashed border-gray-200'}`}>
-                  <div className="text-xs font-semibold text-gray-500 mb-1">RÉGIME DÉLIVRÉ — Chargé Travaux</div>
+                <div className={`p-3 rounded-lg border ${att.regimeDelivreDate ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-dashed border-gray-200 dark:border-gray-700'}`}>
+                  <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">RÉGIME DÉLIVRÉ — Chargé Travaux</div>
                   {att.regimeDelivreDate ? (
                     <>
-                      <div className="text-sm font-medium text-green-700">{att.regimeDelivre?.prenom} {att.regimeDelivre?.nom}</div>
+                      <div className="text-sm font-medium text-green-700 dark:text-green-400">{att.regimeDelivre?.prenom} {att.regimeDelivre?.nom}</div>
                       {att.assistantDelivre && (
-                        <div className="text-xs text-green-600 mt-0.5">Assistant : {att.assistantDelivre.prenom} {att.assistantDelivre.nom}</div>
+                        <div className="text-xs text-green-600 dark:text-green-400 mt-0.5">Assistant : {att.assistantDelivre.prenom} {att.assistantDelivre.nom}</div>
                       )}
-                      <div className="text-xs text-gray-400">{format(new Date(att.regimeDelivreDate), 'dd/MM/yyyy HH:mm')}</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500">{format(new Date(att.regimeDelivreDate), 'dd/MM/yyyy HH:mm')}</div>
                     </>
-                  ) : <div className="text-xs text-gray-400 italic">En attente</div>}
+                  ) : <div className="text-xs text-gray-400 dark:text-gray-500 italic">En attente</div>}
                 </div>
-                <div className={`p-3 rounded-lg border ${att.operationTermineeDate ? 'border-green-200 bg-green-50' : 'border-dashed border-gray-200'}`}>
-                  <div className="text-xs font-semibold text-gray-500 mb-1">OPÉRATION TERMINÉE</div>
-                  {att.operationTermineeDate ? <><div className="text-sm font-medium text-green-700">{att.operationTerminee?.prenom} {att.operationTerminee?.nom}</div><div className="text-xs text-gray-400">{format(new Date(att.operationTermineeDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 italic">En attente</div>}
+                <div className={`p-3 rounded-lg border ${att.operationTermineeDate ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-dashed border-gray-200 dark:border-gray-700'}`}>
+                  <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">OPÉRATION TERMINÉE</div>
+                  {att.operationTermineeDate ? <><div className="text-sm font-medium text-green-700 dark:text-green-400">{att.operationTerminee?.prenom} {att.operationTerminee?.nom}</div><div className="text-xs text-gray-400 dark:text-gray-500">{format(new Date(att.operationTermineeDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 dark:text-gray-500 italic">En attente</div>}
                 </div>
-                <div className={`p-3 rounded-lg border col-span-2 ${att.regimeleveDate ? 'border-gray-300 bg-gray-50' : 'border-dashed border-gray-200'}`}>
-                  <div className="text-xs font-semibold text-gray-500 mb-1">RÉGIME LEVÉ — Chargé Consignation</div>
-                  {att.regimeleveDate ? <><div className="text-sm font-medium text-gray-700">{att.regimeLeve?.prenom} {att.regimeLeve?.nom}</div><div className="text-xs text-gray-400">{format(new Date(att.regimeleveDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 italic">En attente</div>}
+                <div className={`p-3 rounded-lg border col-span-2 ${att.regimeleveDate ? 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/40' : 'border-dashed border-gray-200 dark:border-gray-700'}`}>
+                  <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">RÉGIME LEVÉ — Chargé Consignation</div>
+                  {att.regimeleveDate ? <><div className="text-sm font-medium text-gray-700 dark:text-gray-300">{att.regimeLeve?.prenom} {att.regimeLeve?.nom}</div><div className="text-xs text-gray-400 dark:text-gray-500">{format(new Date(att.regimeleveDate), 'dd/MM/yyyy HH:mm')}</div></> : <div className="text-xs text-gray-400 dark:text-gray-500 italic">En attente</div>}
                 </div>
               </div>
 
               {/* Changements */}
               {att.changements?.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="text-xs text-gray-400 font-medium mb-2">Changements de chargé</div>
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <div className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-2">Changements de chargé</div>
                   <div className="space-y-2">
                     {att.changements.map((c) => (
-                      <div key={c.id} className="text-xs text-gray-600 flex gap-3">
-                        <span className="text-gray-400">{format(new Date(c.dateEffet), 'dd/MM/yyyy HH:mm')}</span>
+                      <div key={c.id} className="text-xs text-gray-600 dark:text-gray-400 flex gap-3">
+                        <span className="text-gray-400 dark:text-gray-500">{format(new Date(c.dateEffet), 'dd/MM/yyyy HH:mm')}</span>
                         <span>{c.typeRole.replace('_', ' ')} : {c.remplace?.prenom} {c.remplace?.nom} → {c.remplacantPrenom} {c.remplacantNom}</span>
                       </div>
                     ))}
@@ -361,13 +361,13 @@ export default function DetailDemande() {
 
               {/* Interruptions */}
               {att.interruptions?.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="text-xs text-gray-400 font-medium mb-2">Arrêts temporaires</div>
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <div className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-2">Arrêts temporaires</div>
                   {att.interruptions.map((intr) => (
-                    <div key={intr.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs mb-2">
-                      <div className="font-medium text-orange-800 mb-1">Arrêt du {intr.dateArret ? format(new Date(intr.dateArret), 'dd/MM/yyyy') : '—'} à {intr.heureArret || '—'}</div>
-                      <div className="text-orange-700">État: <span className="font-semibold capitalize">{intr.etatRegime}</span></div>
-                      {intr.dateReprise && <div className="text-orange-700">Reprise: {format(new Date(intr.dateReprise), 'dd/MM/yyyy HH:mm')}</div>}
+                    <div key={intr.id} className="bg-orange-50 border border-orange-200 dark:bg-orange-900/20 dark:border-orange-800 rounded-lg p-3 text-xs mb-2">
+                      <div className="font-medium text-orange-800 dark:text-orange-300 mb-1">Arrêt du {intr.dateArret ? format(new Date(intr.dateArret), 'dd/MM/yyyy') : '—'} à {intr.heureArret || '—'}</div>
+                      <div className="text-orange-700 dark:text-orange-400">État: <span className="font-semibold capitalize">{intr.etatRegime}</span></div>
+                      {intr.dateReprise && <div className="text-orange-700 dark:text-orange-400">Reprise: {format(new Date(intr.dateReprise), 'dd/MM/yyyy HH:mm')}</div>}
                     </div>
                   ))}
                 </div>
@@ -379,7 +379,7 @@ export default function DetailDemande() {
           {canSeeSecurite && (
             <div className="card">
               <SectionTitle>🛡️ Commentaires sécurité</SectionTitle>
-              <p className="text-xs text-gray-400 mb-3">Visibles uniquement par les rôles sécurité — n'apparaissent jamais sur les documents imprimés.</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">Visibles uniquement par les rôles sécurité — n'apparaissent jamais sur les documents imprimés.</p>
 
               {canWriteSecurite && (
                 <div className="flex gap-2 mb-4">
@@ -401,13 +401,13 @@ export default function DetailDemande() {
               )}
 
               {commentaires.length === 0 ? (
-                <div className="text-sm text-gray-300 italic">Aucun commentaire pour l'instant</div>
+                <div className="text-sm text-gray-300 dark:text-gray-600 italic">Aucun commentaire pour l'instant</div>
               ) : (
                 <div className="space-y-3">
                   {commentaires.map((c) => (
-                    <div key={c.id} className="bg-pink-50 border border-pink-100 rounded-lg p-3">
-                      <div className="text-sm text-gray-800 whitespace-pre-wrap">{c.contenu}</div>
-                      <div className="text-xs text-gray-400 mt-1">{c.auteur.prenom} {c.auteur.nom} — {format(new Date(c.createdAt), 'dd/MM/yyyy HH:mm')}</div>
+                    <div key={c.id} className="bg-pink-50 border border-pink-100 dark:bg-pink-900/20 dark:border-pink-800 rounded-lg p-3">
+                      <div className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">{c.contenu}</div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{c.auteur.prenom} {c.auteur.nom} — {format(new Date(c.createdAt), 'dd/MM/yyyy HH:mm')}</div>
                     </div>
                   ))}
                 </div>
@@ -429,8 +429,8 @@ export default function DetailDemande() {
 
             {/* Panneau admin : forcer le statut */}
             {user.role === 'admin' && (
-              <div className="mt-5 pt-4 border-t border-red-100">
-                <div className="text-xs font-bold text-red-600 uppercase tracking-wide mb-2">⚙️ Administration — Forcer le statut</div>
+              <div className="mt-5 pt-4 border-t border-red-100 dark:border-red-900">
+                <div className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wide mb-2">⚙️ Administration — Forcer le statut</div>
                 <div className="flex gap-2">
                   <select
                     className="input-field text-xs flex-1"
@@ -462,8 +462,8 @@ export default function DetailDemande() {
                     Appliquer
                   </button>
                 </div>
-                <div className="text-xs text-red-400 mt-1">⚠ Action irréversible — modifie demande et attestation</div>
-                <div className="mt-3 pt-3 border-t border-red-100">
+                <div className="text-xs text-red-400 dark:text-red-500 mt-1">⚠ Action irréversible — modifie demande et attestation</div>
+                <div className="mt-3 pt-3 border-t border-red-100 dark:border-red-900">
                   <button
                     onClick={() => setConfirmDeleteDemande(true)}
                     className="w-full px-3 py-2 bg-red-700 text-white text-xs rounded-lg hover:bg-red-800 transition-colors font-medium"
@@ -519,7 +519,7 @@ export default function DetailDemande() {
               {/* Assistant CT: confirmer sa participation */}
               {isAssistantCT && s === 'attente_confirmation_assistant' && att && (
                 <div className="space-y-2">
-                  <div className="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2 text-sm text-amber-800">
+                  <div className="bg-amber-50 border border-amber-300 dark:bg-amber-900/20 dark:border-amber-700 rounded-lg px-3 py-2 text-sm text-amber-800 dark:text-amber-300">
                     ⏳ <strong>{att.regimeDelivre?.prenom} {att.regimeDelivre?.nom}</strong> vous demande de confirmer votre participation pour démarrer les travaux.
                   </div>
                   <button
@@ -534,7 +534,7 @@ export default function DetailDemande() {
 
               {/* CT principal: info d'attente */}
               {isMainCT && s === 'attente_confirmation_assistant' && att && (
-                <div className="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2 text-sm text-amber-800">
+                <div className="bg-amber-50 border border-amber-300 dark:bg-amber-900/20 dark:border-amber-700 rounded-lg px-3 py-2 text-sm text-amber-800 dark:text-amber-300">
                   ⏳ En attente de confirmation de l'assistant <strong>{att.assistantDelivreNom}</strong> pour démarrer les travaux.
                 </div>
               )}
@@ -572,11 +572,11 @@ export default function DetailDemande() {
 
               {/* Chargé consignation: lever régime */}
               {canConsignation && s === 'operation_terminee' && att && !att.regimeleveDate && (
-                <button onClick={() => doAction(async () => { await api.post(`/attestations/${att.id}/lever-regime`); })} disabled={actionLoading} className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm">🔒 Lever le régime (Clôturer)</button>
+                <button onClick={() => doAction(async () => { await api.post(`/attestations/${att.id}/lever-regime`); })} disabled={actionLoading} className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors text-sm">🔒 Lever le régime (Clôturer)</button>
               )}
 
               {s === 'cloturee' && (
-                <div className="text-center py-3 text-sm text-gray-500 bg-gray-50 rounded-lg">✅ Dossier clôturé et archivé</div>
+                <div className="text-center py-3 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-lg">✅ Dossier clôturé et archivé</div>
               )}
             </div>
           </div>
@@ -586,12 +586,12 @@ export default function DetailDemande() {
       {/* Modals */}
       {modal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 text-gray-900 dark:text-gray-100">
             {/* Démarrer travaux */}
             {modal === 'demarrer' && (
               <div>
                 <h3 className="text-lg font-bold mb-1">Accepter le régime et démarrer les travaux</h3>
-                <p className="text-sm text-gray-500 mb-4">Vous pouvez désigner un assistant Chargé de Travaux. Il recevra une notification de confirmation.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Vous pouvez désigner un assistant Chargé de Travaux. Il recevra une notification de confirmation.</p>
                 <div className="mb-4">
                   <label className="label">Assistant Chargé de Travaux (optionnel)</label>
                   <select
@@ -610,11 +610,11 @@ export default function DetailDemande() {
                   </select>
                 </div>
                 {formData.assistantId ? (
-                  <div className="bg-amber-50 border border-amber-300 rounded-lg px-3 py-2 text-sm text-amber-800 mb-4">
+                  <div className="bg-amber-50 border border-amber-300 dark:bg-amber-900/20 dark:border-amber-700 rounded-lg px-3 py-2 text-sm text-amber-800 dark:text-amber-300 mb-4">
                     ⏳ Les travaux ne démarreront qu'après confirmation de l'assistant sélectionné. Une notification lui sera envoyée.
                   </div>
                 ) : (
-                  <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 text-sm text-green-700 mb-4">
+                  <div className="bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800 rounded-lg px-3 py-2 text-sm text-green-700 dark:text-green-400 mb-4">
                     🚀 Sans assistant, les travaux démarreront immédiatement.
                   </div>
                 )}
@@ -674,7 +674,7 @@ export default function DetailDemande() {
                 <h3 className="text-lg font-bold mb-1">
                   {demande.assistantChargeTravaux ? 'Modifier l\'assistant' : 'Désigner un assistant'} Chargé de Travaux
                 </h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                   L'assistant désigné recevra une notification. Sélectionnez "Aucun" pour retirer l'assistant actuel.
                 </p>
                 <div className="mb-4">
@@ -695,7 +695,7 @@ export default function DetailDemande() {
                   </select>
                 </div>
                 {formData.assistantId && formData.assistantId !== demande.assistantChargeTravauxId?.toString() && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-sm text-blue-700 mb-4 flex items-center gap-2">
+                  <div className="bg-blue-50 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 rounded-lg px-3 py-2 text-sm text-blue-700 dark:text-blue-300 mb-4 flex items-center gap-2">
                     <span>🔔</span>
                     <span>Une notification sera envoyée au nouvel assistant.</span>
                   </div>
@@ -772,7 +772,7 @@ export default function DetailDemande() {
                           setFormData({ ...formData, dateEffetHH: hh, dateEffet: d ? `${d}T${hh}:${mm}` : '' });
                         }}
                       />
-                      <span className="text-gray-400 font-bold">:</span>
+                      <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
                       <input
                         className="input-field text-center w-14"
                         placeholder="MM"

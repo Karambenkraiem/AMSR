@@ -67,8 +67,8 @@ const IconShare = () => (
 function IosGuide() {
   return (
     <div className="space-y-3">
-      <p className="text-sm font-semibold text-gray-800">Installer sur iPhone / iPad — sans App Store</p>
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 space-y-2.5">
+      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">Installer sur iPhone / iPad — sans App Store</p>
+      <div className="bg-blue-50 border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800 rounded-xl p-3 space-y-2.5">
         {[
           <>Ouvre ce site dans <b>Safari</b> (pas Chrome)</>,
           <>Appuie sur l'icône Partager <IconShare /> en bas de l'écran</>,
@@ -77,11 +77,11 @@ function IosGuide() {
         ].map((txt, i) => (
           <div key={i} className="flex items-start gap-2.5">
             <div className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">{i+1}</div>
-            <p className="text-sm text-gray-700 leading-snug">{txt}</p>
+            <p className="text-sm text-gray-700 dark:text-gray-300 leading-snug">{txt}</p>
           </div>
         ))}
       </div>
-      <p className="text-xs text-gray-400 text-center">L'app s'ouvre en plein écran, sans barre Safari.</p>
+      <p className="text-xs text-gray-400 dark:text-gray-500 text-center">L'app s'ouvre en plein écran, sans barre Safari.</p>
     </div>
   );
 }
@@ -152,16 +152,16 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
       )}
 
       <div
-        className={`fixed z-[9999] bg-white shadow-2xl ${
+        className={`fixed z-[9999] bg-white dark:bg-gray-800 shadow-2xl ${
           isMobile
             ? 'bottom-0 left-0 right-0 rounded-t-3xl'
-            : 'bottom-5 right-5 w-80 rounded-2xl border border-gray-100'
+            : 'bottom-5 right-5 w-80 rounded-2xl border border-gray-100 dark:border-gray-700'
         }`}
         style={{ animation: leaving ? animOut : animIn }}
       >
         {isMobile && (
           <div className="flex justify-center pt-3">
-            <div className="w-10 h-1 rounded-full bg-gray-200" />
+            <div className="w-10 h-1 rounded-full bg-gray-200 dark:bg-gray-600" />
           </div>
         )}
 
@@ -172,19 +172,19 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
               <span className="text-white font-black text-2xl">S</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-gray-900 leading-tight">AMSR — STEG</p>
-              <p className="text-xs text-gray-500 mt-0.5">Application de Mise Sous Régime</p>
+              <p className="font-bold text-gray-900 dark:text-gray-100 leading-tight">AMSR — STEG</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Application de Mise Sous Régime</p>
               <div className="flex gap-0.5 mt-1">
                 {[1,2,3,4,5].map(i => <span key={i} className="text-amber-400 text-xs">★</span>)}
               </div>
             </div>
-            <button onClick={dismiss} className="text-gray-300 hover:text-gray-500 text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">×</button>
+            <button onClick={dismiss} className="text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300 text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">×</button>
           </div>
 
           {/* Android Chrome → bouton natif OR lien APK */}
           {isAndroid && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                 Installez l'application STEG sur votre Android.
               </p>
               {nativePrompt ? (
@@ -209,7 +209,7 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
                 </a>
               )}
               {!nativePrompt && (
-                <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center leading-relaxed">
                   Activez « Sources inconnues » dans Paramètres › Sécurité si demandé
                 </p>
               )}
@@ -234,27 +234,27 @@ export default function AppInstallPrompt({ forceShow = false, onClose }) {
                 </button>
               )}
 
-              <p className="text-sm text-gray-600">Ou accédez à AMSR depuis votre smartphone :</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Ou accédez à AMSR depuis votre smartphone :</p>
               <div className="grid grid-cols-2 gap-2">
                 <a href={APK_URL} className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white px-3 py-2.5 rounded-xl transition-colors">
                   <IconAndroid cls="w-5 h-5 shrink-0" />
                   <div><div className="text-[9px] text-gray-400 leading-none">Fichier APK</div><div className="text-xs font-bold">Android</div></div>
                 </a>
-                <div className="flex items-center gap-2 bg-gray-100 text-gray-400 px-3 py-2.5 rounded-xl">
+                <div className="flex items-center gap-2 bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 px-3 py-2.5 rounded-xl">
                   <IconApple cls="w-5 h-5 shrink-0" />
                   <div><div className="text-[9px] leading-none">Safari → Partager</div><div className="text-xs font-bold">iPhone / iPad</div></div>
                 </div>
               </div>
 
               {!nativePrompt && (
-                <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+                <p className="text-[11px] text-gray-400 dark:text-gray-500 text-center leading-relaxed">
                   Ouvrez ce site dans Chrome ou Edge pour installer l'application sur cet ordinateur (Windows).
                 </p>
               )}
             </div>
           )}
 
-          <button onClick={dismiss} className="w-full py-2 text-sm text-gray-400 hover:text-gray-500">
+          <button onClick={dismiss} className="w-full py-2 text-sm text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300">
             Non merci, continuer sur le site
           </button>
         </div>

@@ -11,6 +11,13 @@
     <meta name="theme-color" content="#003366" />
     <link rel="manifest" href="/manifest.json" />
     <title>AMSR - Gestion Mise Sous Régime | STEG</title>
+    <script>
+      (function () {
+        var stored = localStorage.getItem('amsr_theme');
+        var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

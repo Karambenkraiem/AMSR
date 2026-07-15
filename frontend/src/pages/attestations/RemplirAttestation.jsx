@@ -218,9 +218,9 @@ export default function RemplirAttestation() {
       <div className="flex items-center justify-between mb-4 no-print">
         <div className="flex items-center gap-3">
           <button type="button" onClick={() => navigate(`/demandes/${id}`)}
-            className="text-gray-500 hover:text-gray-700 text-sm">← Retour au dossier</button>
-          <span className="text-gray-300">/</span>
-          <h1 className="text-lg font-bold text-gray-800">
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm">← Retour au dossier</button>
+          <span className="text-gray-300 dark:text-gray-600">/</span>
+          <h1 className="text-lg font-bold text-gray-800 dark:text-gray-100">
             {att ? 'Modifier l\'Attestation' : 'Remplir l\'Attestation'} — {d.numero}
           </h1>
         </div>
@@ -232,7 +232,7 @@ export default function RemplirAttestation() {
         </div>
       </div>
 
-      {error && <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-2 rounded mb-4 text-sm">{error}</div>}
+      {error && <div className="bg-red-50 border border-red-300 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-2 rounded mb-4 text-sm">{error}</div>}
 
       <form id="att-form" onSubmit={handleSubmit}>
         <div className="bg-white border-2 border-gray-800" style={{ fontFamily: 'Arial, sans-serif', fontSize: '12px' }}>

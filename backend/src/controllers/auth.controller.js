@@ -87,4 +87,18 @@ const updateProfile = async (req, res) => {
   res.json(updated);
 };
 
-module.exports = { login, quickLogin, me, changePassword, updateProfile };
+const updateTheme = async (req, res) => {
+  const { theme } = req.body;
+  if (!['light', 'dark'].includes(theme)) {
+    return res.status(400).json({ error: 'Thème invalide' });
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: req.user.id },
+    data: { theme },
+    select: { id: true, theme: true },
+  });
+  res.json(updated);
+};
+
+module.exports = { login, quickLogin, me, changePassword, updateProfile, updateTheme };

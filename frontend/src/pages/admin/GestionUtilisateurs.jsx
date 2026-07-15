@@ -14,14 +14,14 @@ const ROLE_LABELS = {
 };
 
 const ROLE_COLORS = {
-  admin: 'bg-red-100 text-red-800', charge_travaux: 'bg-blue-100 text-blue-800',
-  charge_consignation: 'bg-yellow-100 text-yellow-800', charge_exploitation: 'bg-green-100 text-green-800',
-  chef_centrale: 'bg-gray-100 text-gray-800',
-  chef_maintenance: 'bg-orange-100 text-orange-800',
-  directeur: 'bg-indigo-100 text-indigo-800',
-  animateur_securite: 'bg-pink-100 text-pink-800',
-  responsable_securite: 'bg-purple-100 text-purple-800',
-  guest: 'bg-slate-100 text-slate-600',
+  admin: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300', charge_travaux: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+  charge_consignation: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300', charge_exploitation: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+  chef_centrale: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+  chef_maintenance: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
+  directeur: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300',
+  animateur_securite: 'bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300',
+  responsable_securite: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
+  guest: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
 };
 
 const emptyForm = { nom: '', prenom: '', email: '', role: 'charge_travaux', matricule: '', centrale: 'Centrale Goulette 2', password: '', active: true };
@@ -132,24 +132,24 @@ export default function GestionUtilisateurs() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Gestion des utilisateurs</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Gestion des utilisateurs</h1>
         <button onClick={openCreate} className="btn-primary">+ Nouvel utilisateur</button>
       </div>
 
       {/* Mode démonstration */}
       <div className="card flex items-center justify-between border-l-4 border-amber-400">
         <div>
-          <div className="font-semibold text-gray-800">🎯 Mode démonstration</div>
-          <p className="text-sm text-gray-500 mt-0.5 max-w-xl">
+          <div className="font-semibold text-gray-800 dark:text-gray-200">🎯 Mode démonstration</div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 max-w-xl">
             Affiche sur la page de connexion un bouton par compte réel actif — connexion en un clic,
-            <strong className="text-amber-700"> sans mot de passe</strong>, pour n'importe quel utilisateur.
+            <strong className="text-amber-700 dark:text-amber-400"> sans mot de passe</strong>, pour n'importe quel utilisateur.
             À activer uniquement pendant une présentation, puis à désactiver juste après.
           </p>
         </div>
         <button
           onClick={toggleDemoMode}
           disabled={demoModeEnabled === null || demoModeSaving}
-          className={`relative w-14 h-8 rounded-full transition-colors shrink-0 ${demoModeEnabled ? 'bg-green-500' : 'bg-gray-300'} disabled:opacity-50`}
+          className={`relative w-14 h-8 rounded-full transition-colors shrink-0 ${demoModeEnabled ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'} disabled:opacity-50`}
           title={demoModeEnabled ? 'Désactiver le mode démo' : 'Activer le mode démo'}
         >
           <span
@@ -160,12 +160,12 @@ export default function GestionUtilisateurs() {
 
       <div className="card">
         {loading ? (
-          <div className="text-center py-12 text-gray-400">Chargement...</div>
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500">Chargement...</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-500 border-b border-gray-200">
+                <tr className="text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
                   {[
                     ['utilisateur', 'Utilisateur'],
                     ['matricule', 'Matricule'],
@@ -178,7 +178,7 @@ export default function GestionUtilisateurs() {
                       <button
                         type="button"
                         onClick={() => toggleSort(key)}
-                        className="group flex items-center hover:text-gray-800 transition-colors"
+                        className="group flex items-center hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
                       >
                         {label}
                         <SortIcon active={sort.key === key} direction={sort.direction} />
@@ -188,33 +188,33 @@ export default function GestionUtilisateurs() {
                   <th className="pb-3 font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
                 {sortedUsers.map((u) => (
-                  <tr key={u.id} className={`hover:bg-gray-50 transition-colors ${!u.active ? 'opacity-50' : ''}`}>
+                  <tr key={u.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${!u.active ? 'opacity-50' : ''}`}>
                     <td className="py-3 pr-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-steg-secondary rounded-full flex items-center justify-center text-white text-xs font-bold">{u.prenom?.[0]}{u.nom?.[0]}</div>
-                        <div className="font-medium text-gray-900">{u.prenom} {u.nom}</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-100">{u.prenom} {u.nom}</div>
                       </div>
                     </td>
-                    <td className="py-3 pr-4 font-mono text-sm font-semibold text-gray-700">{u.matricule || '—'}</td>
+                    <td className="py-3 pr-4 font-mono text-sm font-semibold text-gray-700 dark:text-gray-300">{u.matricule || '—'}</td>
                     <td className="py-3 pr-4"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[u.role]}`}>{ROLE_LABELS[u.role]}</span></td>
-                    <td className="py-3 pr-4 text-gray-500 text-xs">{u.centrale}</td>
-                    <td className="py-3 pr-4 text-gray-400 text-xs">{u.email}</td>
+                    <td className="py-3 pr-4 text-gray-500 dark:text-gray-400 text-xs">{u.centrale}</td>
+                    <td className="py-3 pr-4 text-gray-400 dark:text-gray-500 text-xs">{u.email}</td>
                     <td className="py-3 pr-4">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${u.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${u.active ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'}`}>
                         {u.active ? 'Actif' : 'Inactif'}
                       </span>
                     </td>
                     <td className="py-3">
                       <div className="flex gap-2">
-                        <button onClick={() => openEdit(u)} className="text-xs text-steg-primary hover:underline">Modifier</button>
-                        <button onClick={() => handleToggle(u)} className={`text-xs hover:underline ${u.active ? 'text-orange-500' : 'text-green-600'}`}>
+                        <button onClick={() => openEdit(u)} className="text-xs text-steg-primary dark:text-blue-300 hover:underline">Modifier</button>
+                        <button onClick={() => handleToggle(u)} className={`text-xs hover:underline ${u.active ? 'text-orange-500 dark:text-orange-400' : 'text-green-600 dark:text-green-400'}`}>
                           {u.active ? 'Désactiver' : 'Activer'}
                         </button>
                         <button
                           onClick={() => setConfirmDelete({ id: u.id, nom: `${u.prenom} ${u.nom}` })}
-                          className="text-xs text-red-600 hover:underline font-medium"
+                          className="text-xs text-red-600 dark:text-red-400 hover:underline font-medium"
                         >
                           Supprimer
                         </button>
@@ -239,13 +239,13 @@ export default function GestionUtilisateurs() {
 
       {modal === 'form' && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg p-6 text-gray-900 dark:text-gray-100">
             <h3 className="text-lg font-bold mb-5">{editId ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'}</h3>
-            {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{error}</div>}
+            {error && <div className="bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-3 rounded-lg text-sm mb-4">{error}</div>}
             <form onSubmit={handleSave} className="space-y-4">
               {/* Identifiants de connexion */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-3">
-                <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Identifiants de connexion</p>
+              <div className="bg-blue-50 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 rounded-lg p-3 space-y-3">
+                <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">Identifiants de connexion</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="label">Matricule *</label>

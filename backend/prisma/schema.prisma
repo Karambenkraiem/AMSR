@@ -57,6 +57,7 @@ model User {
   role      Role
   centrale  String   @default("Centrale Goulette 2")
   active    Boolean  @default(true)
+  theme     String   @default("light")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

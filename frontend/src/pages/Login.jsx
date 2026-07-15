@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { getMobileOS, isNativeApp, APK_URL, APPSTORE_URL, IOS_AVAILABLE } from '../utils/mobileDetect';
+import ThemeToggle from '../components/ThemeToggle';
 
 const ROLE_META = {
   admin:                 { label: 'Administrateur',       color: 'bg-red-600',     icon: '🛡️' },
@@ -28,22 +29,22 @@ function QrDownloadModal({ onClose }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-xs p-6 text-center relative"
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-xs p-6 text-center relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-300 hover:text-gray-500 text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+          className="absolute top-3 right-3 text-gray-300 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300 text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
           aria-label="Fermer"
         >
           ×
         </button>
-        <p className="text-sm font-bold text-gray-800 mb-1">Application mobile STEG</p>
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">Scannez pour installer</p>
+        <p className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-1">Application mobile STEG</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-4">Scannez pour installer</p>
         <div className="inline-block p-2 bg-white border border-gray-200 rounded-xl">
           <QRCodeSVG value={downloadUrl} size={160} />
         </div>
-        <p className="text-xs text-gray-500 mt-4 leading-relaxed">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 leading-relaxed">
           Ouvrez l'appareil photo de votre téléphone
           <br />
           et scannez ce code (Android / iOS)
@@ -79,11 +80,11 @@ function AppDownloadSection() {
   // rien : on propose une popup avec un QR code à scanner avec un téléphone.
   if (isDesktop) {
     return (
-      <div className="mt-6 pt-5 border-t border-gray-100">
+      <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-700">
         <button
           type="button"
           onClick={() => setShowQrModal(true)}
-          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
         >
           <span>📱</span>
           Télécharger l'application mobile
@@ -94,8 +95,8 @@ function AppDownloadSection() {
   }
 
   return (
-    <div className="mt-6 pt-5 border-t border-gray-100">
-      <p className="text-xs text-gray-400 font-medium text-center mb-3 uppercase tracking-wide">
+    <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-700">
+      <p className="text-xs text-gray-400 dark:text-gray-500 font-medium text-center mb-3 uppercase tracking-wide">
         Application mobile STEG
       </p>
 
@@ -137,7 +138,7 @@ function AppDownloadSection() {
               </div>
             </a>
           ) : (
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl flex-1 bg-gray-100 text-gray-400 cursor-not-allowed">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl flex-1 bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 cursor-not-allowed">
               {/* Apple icon */}
               <svg viewBox="0 0 24 24" className="w-7 h-7 shrink-0" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -146,14 +147,14 @@ function AppDownloadSection() {
                 <div className="text-xs leading-none">Bientôt sur</div>
                 <div className="text-sm font-bold leading-tight">App Store</div>
               </div>
-              <span className="ml-auto text-xs bg-gray-300 text-gray-500 px-2 py-0.5 rounded-full">Bientôt</span>
+              <span className="ml-auto text-xs bg-gray-300 text-gray-500 dark:bg-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full">Bientôt</span>
             </div>
           )
         )}
       </div>
 
       {os === 'android' && (
-        <p className="text-xs text-gray-400 text-center mt-2">
+        <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-2">
           Activer "Sources inconnues" dans Paramètres &rsaquo; Sécurité si demandé
         </p>
       )}
@@ -215,8 +216,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-steg-dark to-steg-primary flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-steg-dark to-steg-primary flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
         <div className="bg-steg-primary p-8 text-center">
           <div className="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center mb-4">
@@ -229,10 +233,10 @@ export default function Login() {
 
         {/* Form */}
         <div className="p-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">Connexion</h2>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Connexion</h2>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">
+            <div className="bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-3 rounded-lg text-sm mb-4">
               {error}
             </div>
           )}
@@ -264,7 +268,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   tabIndex={-1}
                 >
@@ -289,11 +293,11 @@ export default function Login() {
 
           {/* Section démo */}
           {demoModeEnabled && (
-            <div className="mt-5 pt-5 border-t border-gray-100">
+            <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => setDemoOpen(o => !o)}
-                className="w-full flex items-center justify-between text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                className="w-full flex items-center justify-between text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
                 <span className="flex items-center gap-2">
                   <span className="text-base">🎯</span>
@@ -305,7 +309,7 @@ export default function Login() {
               {demoOpen && (
                 <div className="mt-3 max-h-72 overflow-y-auto grid grid-cols-3 gap-2 pr-1">
                   {quickUsers.length === 0 && (
-                    <div className="col-span-3 text-xs text-gray-400 text-center py-4">Aucun compte disponible</div>
+                    <div className="col-span-3 text-xs text-gray-400 dark:text-gray-500 text-center py-4">Aucun compte disponible</div>
                   )}
                   {quickUsers.map(u => {
                     const meta = ROLE_META[u.role] || { label: u.role, color: 'bg-gray-500', icon: '👤' };

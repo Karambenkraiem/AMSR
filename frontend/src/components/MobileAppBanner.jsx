@@ -37,7 +37,7 @@ export default function MobileAppBanner() {
   const isAndroid = os === 'android';
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-white border-t border-gray-200 shadow-2xl">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-2xl">
       <div className="flex items-center gap-3 max-w-lg mx-auto">
         {/* Icône app */}
         <div className="w-12 h-12 rounded-xl bg-steg-primary flex items-center justify-center shrink-0 shadow">
@@ -46,8 +46,8 @@ export default function MobileAppBanner() {
 
         {/* Texte */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-gray-900 leading-tight">AMSR — STEG</p>
-          <p className="text-xs text-gray-500 leading-tight mt-0.5">
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100 leading-tight">AMSR — STEG</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight mt-0.5">
             {isAndroid ? 'Disponible sur Google Play' : 'Disponible sur l\'App Store'}
           </p>
           <div className="flex items-center gap-1 mt-0.5">
@@ -71,7 +71,7 @@ export default function MobileAppBanner() {
         {/* Fermer */}
         <button
           onClick={dismiss}
-          className="shrink-0 w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 text-lg leading-none"
+          className="shrink-0 w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-lg leading-none"
           aria-label="Fermer"
         >
           ×

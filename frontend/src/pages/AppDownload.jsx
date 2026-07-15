@@ -14,22 +14,22 @@ export default function AppDownload() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-steg-dark to-steg-primary flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden text-center p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden text-center p-8">
         <div className="w-16 h-16 bg-steg-primary rounded-full mx-auto flex items-center justify-center mb-4">
           <span className="text-white font-bold text-2xl">S</span>
         </div>
-        <h1 className="text-lg font-bold text-gray-800 mb-2">Application AMSR — STEG</h1>
+        <h1 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">Application AMSR — STEG</h1>
 
         {os === 'android' && (
-          <p className="text-sm text-gray-500">Téléchargement en cours…</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Téléchargement en cours…</p>
         )}
         {os === 'ios' && (
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             L'application iOS n'est pas encore disponible. Revenez bientôt !
           </p>
         )}
         {os === null && (
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Ouvrez ce lien depuis votre téléphone (ou scannez le code QR sur la page de connexion) pour installer l'application.
           </p>
         )}
@@ -48,12 +48,12 @@ export default function AppDownload() {
               href={APPSTORE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors text-sm font-bold"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 rounded-xl transition-colors text-sm font-bold"
             >
               Disponible sur l'App Store
             </a>
           ) : (
-            <span className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-400 rounded-xl text-sm font-bold cursor-not-allowed">
+            <span className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 rounded-xl text-sm font-bold cursor-not-allowed">
               Bientôt sur l'App Store
             </span>
           )}

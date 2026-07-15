@@ -84,7 +84,7 @@ export default function NouvelleDemande() {
     <div className="max-w-5xl mx-auto">
       {/* Page title */}
       <div className="flex items-center justify-between mb-4 no-print">
-        <h1 className="text-xl font-bold text-gray-800">Nouvelle Demande de Mise Sous Régime</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Nouvelle Demande de Mise Sous Régime</h1>
         <div className="flex gap-3">
           <button type="button" onClick={() => navigate(-1)} className="btn-outline text-sm">Annuler</button>
           <button form="dmsr-form" type="submit" disabled={loading} className="btn-primary text-sm">
@@ -94,7 +94,7 @@ export default function NouvelleDemande() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-2 rounded mb-4 text-sm">{error}</div>
+        <div className="bg-red-50 border border-red-300 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-2 rounded mb-4 text-sm">{error}</div>
       )}
 
       {/* FORMULAIRE PAPIER */}

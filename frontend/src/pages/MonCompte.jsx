@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function MonCompte() {
   const { user, updateUser } = useAuth();
+  const { theme } = useTheme();
 
   const [profileForm, setProfileForm] = useState({ nom: user?.nom || '', prenom: user?.prenom || '', email: user?.email || '' });
   const [profileSaving, setProfileSaving] = useState(false);
@@ -53,13 +56,27 @@ export default function MonCompte() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Mon compte</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Mon compte</h1>
+
+      {/* Préférences */}
+      <div className="card">
+        <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Préférences</h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium text-gray-800 dark:text-gray-200">Mode sombre</div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              {theme === 'dark' ? 'Activé' : 'Désactivé'} — enregistré sur votre compte, appliqué sur tous vos appareils
+            </div>
+          </div>
+          <ThemeToggle />
+        </div>
+      </div>
 
       {/* Informations personnelles */}
       <div className="card">
-        <h2 className="font-semibold text-gray-800 mb-4">Informations personnelles</h2>
-        {profileError && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{profileError}</div>}
-        {profileSuccess && <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm mb-4">{profileSuccess}</div>}
+        <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Informations personnelles</h2>
+        {profileError && <div className="bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-3 rounded-lg text-sm mb-4">{profileError}</div>}
+        {profileSuccess && <div className="bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 px-4 py-3 rounded-lg text-sm mb-4">{profileSuccess}</div>}
         <form onSubmit={saveProfile} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -77,8 +94,8 @@ export default function MonCompte() {
           </div>
           <div>
             <label className="label">Matricule</label>
-            <input disabled className="input-field bg-gray-50 text-gray-400" value={user?.matricule || ''} />
-            <p className="text-xs text-gray-400 mt-1">Le matricule (identifiant de connexion) ne peut être modifié que par un administrateur.</p>
+            <input disabled className="input-field bg-gray-50 text-gray-400 dark:bg-gray-900 dark:text-gray-500" value={user?.matricule || ''} />
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Le matricule (identifiant de connexion) ne peut être modifié que par un administrateur.</p>
           </div>
           <div className="flex justify-end">
             <button type="submit" disabled={profileSaving} className="btn-primary">{profileSaving ? 'Enregistrement...' : 'Enregistrer'}</button>
@@ -88,9 +105,9 @@ export default function MonCompte() {
 
       {/* Mot de passe */}
       <div className="card">
-        <h2 className="font-semibold text-gray-800 mb-4">Changer le mot de passe</h2>
-        {pwdError && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-4">{pwdError}</div>}
-        {pwdSuccess && <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm mb-4">{pwdSuccess}</div>}
+        <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Changer le mot de passe</h2>
+        {pwdError && <div className="bg-red-50 border border-red-200 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300 px-4 py-3 rounded-lg text-sm mb-4">{pwdError}</div>}
+        {pwdSuccess && <div className="bg-green-50 border border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300 px-4 py-3 rounded-lg text-sm mb-4">{pwdSuccess}</div>}
         <form onSubmit={savePassword} className="space-y-4">
           <div>
             <label className="label">Mot de passe actuel *</label>
